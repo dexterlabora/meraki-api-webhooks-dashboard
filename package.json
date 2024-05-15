@@ -1,0 +1,57 @@
+{
+  "name": "meraki-api-webhooks-dashboard",
+  "version": "1.0.0",
+  "description": "An API first approach to monitor Meraki API and webhooks",
+  "main": "main.js",
+  "bin": "./server.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac --publish 'always' ",
+    "build-mac2":"electron-builder --mac --x64 --arm64 --publish 'onTagOrDraft'",
+    "build-all": "electron-builder -mw --publish 'always' && npm run move-binaries",
+    "move-binaries": "cp build/*.exe dist/ && cp build/*.dmg dist/"
+
+  },
+  "keywords": [
+    "Cisco",
+    "Meraki"
+  ],
+  "author": "Cory Guynn",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@electron/packager": "18.3.2",
+    "electron": "^30.0.2",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "files": "!./dist/**/*, !./build/**/*, !./mockData/**, !./archive/**, !meraki-api-webhooks-ui-screenshot.png, !.git/**",
+    "appId": "Meraki.API.Webhooks.Dashboard",
+    "win": {
+      "target": "nsis",
+      "icon": "./icons/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "mas",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "icon": "./icons/api-logo.icns",
+      "identity": null
+    },
+    "directories": {
+      "output": "build"
+    }
+  }
+}

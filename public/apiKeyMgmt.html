@@ -1,0 +1,38 @@
+<!-- apiKeyMgmt.html -->
+<div class="api-keys-container">
+
+ <!-- header -->
+  <div class="api-keys-mgmt-header">
+    <h2>Personal</h2> 
+    <div class="userDetails">
+    <label>API Keys for</label> <span id="userName"></span> (<span id="userEmail"></span>)
+  </div>
+    <div class="api-keys-info">
+      <p>Maximum of 2 keys</p>
+      <button id="generateApiKeyBtn" onclick="generateApiKey()" disabled>
+        Generate API Key
+      </button>
+      
+    </div>
+  </div>
+
+<!-- API Keys Table -->
+  <table class="api-keys-table">
+    <thead>
+      <tr>
+        <th>API Key</th>
+        <th>Time Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="apiKeysList">
+      <!-- API keys will be dynamically added here -->
+    </tbody>
+  </table>
+  <div class="notification">
+    You’ve reached your limit of 2 API keys and must revoke one to generate a
+    new one.
+  </div>
+</div>
+
+<script type="module" src="apiKeyMgmt.js"></script>

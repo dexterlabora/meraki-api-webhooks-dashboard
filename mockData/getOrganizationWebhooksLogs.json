@@ -1,0 +1,502 @@
+[
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T09:51:32.148000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 400,
+        "responseDuration": 206,
+        "sentAt": "2024-03-20T09:51:31.940999Z",
+        "url": "https://discord.com/api/webhooks/00000/00000"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T09:51:32.157999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 400,
+        "responseDuration": 216,
+        "sentAt": "2024-03-20T09:51:31.940999Z",
+        "url": "https://discord.com/api/webhooks/00000/00000"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T09:51:37.848000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 400,
+        "responseDuration": 236,
+        "sentAt": "2024-03-20T09:51:37.611999Z",
+        "url": "https://discord.com/api/webhooks/00000/00000"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T09:51:37.852999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 400,
+        "responseDuration": 240,
+        "sentAt": "2024-03-20T09:51:37.611999Z",
+        "url": "https://discord.com/api/webhooks/00000/00000"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T09:57:20.523000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 19,
+        "sentAt": "2024-03-20T09:57:20.503000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T09:57:30.595000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 14,
+        "sentAt": "2024-03-20T09:57:30.581000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Client connectivity changed",
+        "loggedAt": "2024-03-20T09:59:01.267999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 15,
+        "sentAt": "2024-03-20T09:59:01.252000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Client connectivity changed",
+        "loggedAt": "2024-03-20T09:59:06.430000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 16,
+        "sentAt": "2024-03-20T09:59:06.413000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:00:26.822999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 21,
+        "sentAt": "2024-03-20T10:00:26.799999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T10:06:09.940000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 18,
+        "sentAt": "2024-03-20T10:06:09.920000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T10:12:58.079999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 400,
+        "responseDuration": 201,
+        "sentAt": "2024-03-20T10:12:57.878000Z",
+        "url": "https://discord.com/api/webhooks/00000/00000"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T10:12:58.086999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 400,
+        "responseDuration": 208,
+        "sentAt": "2024-03-20T10:12:57.878000Z",
+        "url": "https://discord.com/api/webhooks/00000/00000"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T10:18:45.223999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 35,
+        "sentAt": "2024-03-20T10:18:45.187999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T10:18:50.266000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 17,
+        "sentAt": "2024-03-20T10:18:50.247999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:18:55.279999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 16,
+        "sentAt": "2024-03-20T10:18:55.263000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:19:00.302000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 22,
+        "sentAt": "2024-03-20T10:19:00.279000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:24:52.025000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 17,
+        "sentAt": "2024-03-20T10:24:52.006999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:24:57.036999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 19,
+        "sentAt": "2024-03-20T10:24:57.017999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:27:33.888999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 17,
+        "sentAt": "2024-03-20T10:27:33.871000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:27:39.062000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 15,
+        "sentAt": "2024-03-20T10:27:39.046000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Client connectivity changed",
+        "loggedAt": "2024-03-20T10:41:49.161999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 20,
+        "sentAt": "2024-03-20T10:41:49.141999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T10:43:09.677000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 21,
+        "sentAt": "2024-03-20T10:43:09.655999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T10:48:52.338999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 18,
+        "sentAt": "2024-03-20T10:48:52.319999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T10:48:57.365000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 26,
+        "sentAt": "2024-03-20T10:48:57.338000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Sensor change detected",
+        "loggedAt": "2024-03-20T11:01:30.341000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 20,
+        "sentAt": "2024-03-20T11:01:30.319000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:01:40.351999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 15,
+        "sentAt": "2024-03-20T11:01:40.335999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:05:22.216000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 17,
+        "sentAt": "2024-03-20T11:05:22.197999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T11:05:28.473999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 200,
+        "responseDuration": 6276,
+        "sentAt": "2024-03-20T11:05:22.197999Z",
+        "url": "https://webexapis.com/v1/messages"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:05:32.260999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 14,
+        "sentAt": "2024-03-20T11:05:32.246999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:05:37.391000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 29,
+        "sentAt": "2024-03-20T11:05:37.361000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:05:52.415999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 17,
+        "sentAt": "2024-03-20T11:05:52.398999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:05:57.430999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 14,
+        "sentAt": "2024-03-20T11:05:57.415999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:06:37.563999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 19,
+        "sentAt": "2024-03-20T11:06:37.543999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:09:18.082999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 29,
+        "sentAt": "2024-03-20T11:09:18.052000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:09:23.161999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 18,
+        "sentAt": "2024-03-20T11:09:23.144000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T11:09:29.167999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 200,
+        "responseDuration": 6021,
+        "sentAt": "2024-03-20T11:09:23.147000Z",
+        "url": "https://webexapis.com/v1/messages"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:09:33.187999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 21,
+        "sentAt": "2024-03-20T11:09:33.167000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:09:38.200000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 21,
+        "sentAt": "2024-03-20T11:09:38.177999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:09:48.224999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 19,
+        "sentAt": "2024-03-20T11:09:48.204999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:10:28.364000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 14,
+        "sentAt": "2024-03-20T11:10:28.348999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:11:49.697999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 33,
+        "sentAt": "2024-03-20T11:11:49.664000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:14:30.520999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 20,
+        "sentAt": "2024-03-20T11:14:30.500000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:14:40.546000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 19,
+        "sentAt": "2024-03-20T11:14:40.526999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:19:52.058000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 16,
+        "sentAt": "2024-03-20T11:19:52.040999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:19:57.084000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 29,
+        "sentAt": "2024-03-20T11:19:57.053999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:23:21.178999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 177,
+        "sentAt": "2024-03-20T11:23:21.000999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "",
+        "loggedAt": "2024-03-20T11:23:27.140000Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": 200,
+        "responseDuration": 6139,
+        "sentAt": "2024-03-20T11:23:21.000999Z",
+        "url": "https://webexapis.com/v1/messages"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:23:31.069999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 17,
+        "sentAt": "2024-03-20T11:23:31.052000Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:23:36.085999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 18,
+        "sentAt": "2024-03-20T11:23:36.066999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    },
+    {
+        "alertType": "Motion detected",
+        "loggedAt": "2024-03-20T11:23:46.260999Z",
+        "networkId": "L_6434517967XXXXXX",
+        "organizationId": "00001111",
+        "responseCode": -1,
+        "responseDuration": 16,
+        "sentAt": "2024-03-20T11:23:46.244999Z",
+        "url": "https://home-lab.my-test-server.com/alerts"
+    }
+]
