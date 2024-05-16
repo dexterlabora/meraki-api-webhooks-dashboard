@@ -1,16 +1,27 @@
-<!-- apiKeyMgmt.html -->
-<!-- <div class="webhooks-container"> -->
-
-
-
-<div class="webhooks-receivers-container">
-    <h2>Webhook Receivers</h2>
-
-    <table id="webhookReceiversTable" class="webhooks-table">
+<div class="webhook-receivers-container">
+    <style>
+        .webhook-receivers-table {
+            width: 100%; /* Ensures the table uses the full width */
+            table-layout: fixed; /* Helps in applying fixed widths to columns */
+        }
+        .webhook-receivers-table th, .webhook-receivers-table td {
+            overflow: hidden; /* Prevents text from spilling out of cells */
+        }
+        .webhook-receivers-table .url-column {
+            width: 400px; /* Fixed width for the URL column */
+            overflow-x: auto; /* Enables horizontal scrolling within the cell */
+            white-space: nowrap; /* Ensures the content stays in a single line */
+        }
+    </style>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
+        <h2>Webhook Receivers</h2>
+        <button id="addReceiverBtn">Add New Receiver</button>
+    </div>
+    <table id="webhookReceiversTable" class="webhook-receivers-table">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>URL</th>
+                <th class="url-column">URL</th>
                 <th>Shared Secret</th>
                 <th>Payload Template</th>
                 <th>Actions</th>
@@ -20,9 +31,29 @@
             <!-- Dynamically filled by JavaScript -->
         </tbody>
     </table>
-</div>
-</div>
 
-<!-- </div> -->
-<!-- <script src="webhookReceivers.js" ></script> -->
-<!-- <script type="module" src="webhookReceivers.js" defer></script> -->
+    <!-- Modal for Adding/Editing Webhook Receivers -->
+    <div id="receiverModal" class="modal">
+        <div class="modal-content">
+            <span class="close-receiver-modal">&times;</span>
+            <form id="receiverForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="url">URL:</label>
+                <input type="url" id="url" name="url" required>
+
+                <label for="sharedSecret">Shared Secret:</label>
+                <input type="text" id="sharedSecret" name="sharedSecret">
+
+                <label for="payloadTemplate">Payload Template:</label>
+                <select id="payloadTemplate" name="payloadTemplate">
+                    <option value="default">Meraki (included)</option>
+                    <!-- Additional options will be populated here -->
+                </select>
+
+                <input type="submit" value="Save">
+            </form>
+        </div>
+    </div>
+</div>

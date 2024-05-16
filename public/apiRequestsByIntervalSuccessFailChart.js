@@ -64,7 +64,7 @@ function getResponseCodeDescription(code) {
     }
 }
 
-function updateApiRequestsLineChart(data, timespanSeconds) {
+function updateApiRequestsSuccessFailChart(data, timespanSeconds) {
     const labelFormat = getLabelFormat(timespanSeconds);
     const reversedData = [...data].reverse();
 
@@ -88,8 +88,8 @@ function updateApiRequestsLineChart(data, timespanSeconds) {
             label: 'Success',
             backgroundColor: 'green',
             borderColor: 'green',
-            fill: true,
-            tension: 0.2,
+            fill: false,
+            tension: .5,
             data: successData
             
         },
@@ -98,7 +98,7 @@ function updateApiRequestsLineChart(data, timespanSeconds) {
             backgroundColor: 'red',
             borderColor: 'red',
             fill: true,
-            tension: 0.2,
+            tension: .5,
             data: failureData
         }
     ];
@@ -108,12 +108,12 @@ function updateApiRequestsLineChart(data, timespanSeconds) {
         return formatLabel(date, labelFormat);
     });
 
-    if (window.apiRequestIntervalChart) {
-        window.apiRequestIntervalChart.destroy();
+    if (window.apiRequestsByIntervalSuccessFailChart) {
+        window.apiRequestsByIntervalSuccessFailChart.destroy();
     }
 
-    window.apiRequestIntervalChart = new Chart(ctx, {
-        type: 'line',
+    window.apiRequestsByIntervalSuccessFailChart = new Chart(ctx, {
+        type: 'bar',
         data: {
             labels: labels,
             datasets: datasets
@@ -127,16 +127,25 @@ function updateApiRequestsLineChart(data, timespanSeconds) {
                     }
                 },
                 y: {
-                    beginAtZero: true
+                    
+                    stacked: false
                 }
             },
             responsive: true,
-            maintainAspectRatio: false,
+            pointRadius: .05,
+            maintainAspectRatio: true,
             plugins: {
                 legend: { display: true }
             }
         }
     });
+    
+    window.addEventListener('resize', function() {
+        if (window.apiRequestsByIntervalSuccessFailChart) {
+          window.apiRequestsByIntervalSuccessFailChart.resize();
+        }
+      });
+
 }
 
-export default updateApiRequestsLineChart;
+export default updateApiRequestsSuccessFailChart;

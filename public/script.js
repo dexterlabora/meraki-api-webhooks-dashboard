@@ -5,13 +5,14 @@ import API from './apiHandlers.js';
 import apiRequestsMetricsViz from './apiRequestsMetricsViz.js';
 import webhookMetricsViz from './webhookMetricsViz.js';
 import updateWebhookHistoryChart from './webhookHistoryChart.js';
-import updateWebhookHistoryByIntervalLineChart from './webhookHistoryByIntervalLineChart.js';
+import updateWebhookHistoryByIntervalSuccessFailChart from './webhookHistoryByIntervalSuccessFailChart.js';
 import updateApiRequestsChart from './apiRequestsByIntervalChart.js';
-import updateApiRequestsLineChart from './apiRequestsByIntervalLineChart.js';
+import updateApiRequestsSuccessFailChart from './apiRequestsByIntervalSuccessFailChart.js';
 import { updateWebhookHistoryByAlertTypeChart } from './webhookHistoryByAlertTypeChart.js';
 import { fetchApiKeys } from './apiKeyMgmt.js';
 import { setupTableSortListeners } from './tableSorter.js';
 import { init as initWebhookReceivers } from './webhookReceivers.js';
+import { init as initWebhookTemplates } from './webhookTemplates.js';
 
 // configs
 const apiKeyInput = document.getElementById('apiKey');
@@ -125,6 +126,11 @@ function initializeEventListeners() {
     configToggle.onclick = () => configModal.style.display = 'block';
     closeModal.onclick = () => configModal.style.display = 'none';
     window.onclick = (event) => {
+        console.log("closeModal onclick event")
+        console.log("closeModal onclick event.target", event.target)
+        if (event.target === configModal) {
+            configModal.style.display = 'none';
+        }
         if (event.target === configModal) {
             configModal.style.display = 'none';
         }
@@ -142,6 +148,13 @@ function initializeEventListeners() {
         await fetchOrganizationAdmins(organizationId);
         updateVisualizationsForOrganization(organizationId);
     };
+
+    // Event listener for global timespan selector
+    globalTimespanSelect.addEventListener('change', () => {
+        const timespanSeconds = getTimespanInSeconds(globalTimespanSelect.value);
+        fetchApiDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
+        fetchWebhooksDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
+    });
 
     document.getElementById('apiRequestsTimespanSelect').addEventListener('change', function () {
         const timespanSeconds = getTimespanInSeconds(this.value);
@@ -182,7 +195,7 @@ function initializeEventListeners() {
         setActiveTab('webhookManagementTab');
         setActiveTab('webhookMetricsTab');
     });
-    
+
     document.getElementById('apiMetricsBtnShortcut')?.addEventListener('click', () => {
         setActiveTab('apiManagementTab');
         setActiveTab('apiMetricsTab');
@@ -239,6 +252,9 @@ function loadContentForTab(tabId, contentElement) {
     } else if (tabId === 'webhookReceiversTab') {
         fetchAndDisplayWebhookReceiversPage(contentElement);
     }
+    else if (tabId === 'webhookTemplatesTab') {
+        fetchAndDisplayWebhookTemplatesPage(contentElement);
+    }
 }
 
 // Event listeners for top-level tabs and sub-tabs
@@ -280,7 +296,18 @@ function fetchAndDisplayWebhookReceiversPage(content) {
         .then(response => response.text())
         .then(html => {
             content.innerHTML = html;
-            initWebhookReceivers();
+            const api = new API(localStorage.getItem('MerakiApiKey'));
+            initWebhookReceivers(api);
+        });
+
+}
+
+function fetchAndDisplayWebhookTemplatesPage(content) {
+    fetch('webhookTemplates.html')
+        .then(response => response.text())
+        .then(html => {
+            content.innerHTML = html;
+            initWebhookTemplates();
         });
 
 }
@@ -440,7 +467,7 @@ async function fetchApiDataAndUpdateVis(apiKey, organizationId, timespanSeconds)
 
         updateApiRequestHero(apiRequestsOverviewData);
         updateApiRequestsChart(responseCodesData, timespanSeconds);
-        updateApiRequestsLineChart(responseCodesData, timespanSeconds);
+        updateApiRequestsSuccessFailChart(responseCodesData, timespanSeconds);
         updateApiRequestTable(apiRequestsData);
         const apiRequestMetricsData = apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins')));
         console.log("apiRequestMetricsData", apiRequestMetricsData);
@@ -466,11 +493,11 @@ async function fetchWebhooksDataAndUpdateVis(apiKey, organizationId, timespanSec
         console.log("webhookLogsData", webhookLogsData);
         updateWebhookHero(webhookLogsData);
         updateWebhookHistoryChart(webhookLogsData, timespanSeconds);
-        updateWebhookHistoryByIntervalLineChart(webhookLogsData, timespanSeconds);
+        updateWebhookHistoryByIntervalSuccessFailChart(webhookLogsData, timespanSeconds);
         updateWebhookHistoryByAlertTypeChart(webhookLogsData, timespanSeconds);
         populateUrlSelector(webhookLogsData);
         webhookMetricsViz(webhookLogsData);
-        updateWebhookLogsTable(webhookLogsData);  
+        updateWebhookLogsTable(webhookLogsData);
         const httpServerStats = calculateHttpServerStats(webhookLogsData);
         updateHttpServerStats(httpServerStats);
         setupTableSortListeners("#webhookLogsTable");
@@ -717,7 +744,7 @@ async function updateDashboardWithFilters() {
             sourceIp
         });
         updateApiRequestsChart(responseCodesData, timespan);
-        updateApiRequestsLineChart(responseCodesData, timespanSeconds);
+        updateApiRequestsSuccessFailChart(responseCodesData, timespanSeconds);
     } catch (error) {
         console.error('Error updating chart:', error);
         alert('Failed to update the chart based on the selected filters.');

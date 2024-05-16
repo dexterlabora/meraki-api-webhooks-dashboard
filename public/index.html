@@ -16,12 +16,26 @@
     Meraki Credentials
   </button>
 
+
+  <div class="selector-container">
   <!-- Organization Select -->
   <label for="organizationSelect">Organization:</label>
   <select id="organizationSelect" required>
     <option value="">Select Organization</option>
   </select>
 
+      <!-- Global Timespan Selector -->
+      
+    <div class="global-timespan-selector">
+      <label for="globalTimespanSelect">Timespan:</label>
+      <select id="globalTimespanSelect">
+        <option value="twoHours">Last 2 Hours</option>
+        <option value="day" selected>Last Day</option>
+        <option value="week">Last Week</option>
+        <option value="month">Last Month</option>
+      </select>
+    </div>
+  </div>
 
 
   <!-- Configuration Modal Content -->

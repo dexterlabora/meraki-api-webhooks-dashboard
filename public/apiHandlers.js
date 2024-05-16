@@ -117,6 +117,92 @@ class API {
         const url =`/api/administered/identities/me/api/keys/revoke/${suffix}`
         return this.fetch(url);
     }
+
+    // HTTP Servers
+    // List the HTTP servers for an organization
+    getOrganizationWebhooksHttpServers(organizationId) {
+        const url = `/api/organizations/${organizationId}/webhooks/httpServers`;
+        return this.fetch(url);
+    }
+
+    // Add an HTTP server to an organization
+    createOrganizationWebhooksHttpServer(organizationId, data) {
+        const url = `/api/organizations/${organizationId}/webhooks/httpServers`;
+        return this.fetch(url, {
+            method: 'POST',
+            headers: { ...this.headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    }
+
+    // Return an HTTP server for an organization
+    getOrganizationWebhooksHttpServer(organizationId, httpServerId) {
+        const url = `/api/organizations/${organizationId}/webhooks/httpServers/${httpServerId}`;
+        return this.fetch(url);
+    }
+
+    // Update an HTTP server for an organization
+    updateOrganizationWebhooksHttpServer(organizationId, httpServerId, data) {
+        const url = `/api/organizations/${organizationId}/webhooks/httpServers/${httpServerId}`;
+        return this.fetch(url, {
+            method: 'PUT',
+            headers: { ...this.headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    }
+
+    // Delete an HTTP server from an organization
+    deleteOrganizationWebhooksHttpServer(organizationId, httpServerId) {
+        const url = `/api/organizations/${organizationId}/webhooks/httpServers/${httpServerId}`;
+        return this.fetch(url, {
+            method: 'DELETE',
+            headers: this.headers
+        });
+    }
+
+    // Webhook Payload Templates
+
+    // List the webhook payload templates for an organization
+    getOrganizationWebhooksPayloadTemplates(organizationId) {
+        const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates`;
+        return this.fetch(url);
+    }
+
+    // Create a webhook payload template for an organization
+    createOrganizationWebhooksPayloadTemplate(organizationId, data) {
+        const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates`;
+        return this.fetch(url, {
+            method: 'POST',
+            headers: { ...this.headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    }
+
+    // Get the webhook payload template for an organization
+    getOrganizationWebhooksPayloadTemplate(organizationId, payloadTemplateId) {
+        const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates/${payloadTemplateId}`;
+        return this.fetch(url);
+    }
+
+    // Update a webhook payload template for an organization
+    updateOrganizationWebhooksPayloadTemplate(organizationId, payloadTemplateId, data) {
+        const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates/${payloadTemplateId}`;
+        return this.fetch(url, {
+            method: 'PUT',
+            headers: { ...this.headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    }
+
+    // Destroy a webhook payload template for an organization
+    deleteOrganizationWebhooksPayloadTemplate(organizationId, payloadTemplateId) {
+        const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates/${payloadTemplateId}`;
+        return this.fetch(url, {
+            method: 'DELETE',
+            headers: this.headers
+        });
+    }
+
 }
 
 export default API;

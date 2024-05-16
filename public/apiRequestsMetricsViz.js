@@ -41,7 +41,7 @@ function getFailureRateColorClass(failureCount) {
 // ******************
 
 const createSummaryCard = (summary) => {
-    let content = `<div class="summary-card">
+    let content = `<div class="analysis-container"><div class="summary">
       <h3>Summary</h3>
       <div class="summary-content">`;
 
@@ -53,10 +53,13 @@ const createSummaryCard = (summary) => {
             content += createSummaryListItem(anomaly);
         });
         content += `</ul>
-        </div>`;
+        </div></div></div><div class="metric-pie-chart">
+        
+        <canvas id="User AgentsChart"></canvas>
+      </div>`;
     }
 
-    content += `</div></div>`;
+    content += `</div>`;
 
     return content;
 };
@@ -373,11 +376,12 @@ function renderUserAgentPieChart(title, data) {
                         top: 10,
                         bottom: 10
                     },
-                    postion: 'left',
-                    align: 'start'
+                    
+                    align: 'center'
                 },
                 legend: {
                     position: 'right',
+                    display: false // 
                 },
                 tooltip: {
                     callbacks: {
@@ -419,7 +423,7 @@ const displayMetrics = (metrics) => {
 
     // Summary
     container.innerHTML += createSummaryCard(metrics['Summary']);
-    container.innerHTML += createPieChart("User Agents", metrics['User Agents']);
+   // container.innerHTML += createPieChart("User Agents", metrics['User Agents']);
     // WHY
     container.innerHTML += createApplicationsCard(metrics['Applications'])
 

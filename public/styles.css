@@ -50,6 +50,12 @@ button {
     transition: all 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
 }
 
+  /* Style for the select element to fit content */
+  select {
+    width: auto; /* Adjust width to fit content */
+    padding: 5px; /* Add some padding for better appearance */
+    font-size: 1em; /* Adjust font size if needed */
+  }
 
 .tabs {
     display: flex;
@@ -347,7 +353,22 @@ td {
     left: 0;
     width: 100%;
     max-width: 500px;
-    height: 50%;
+    height: 100%;
+}
+
+#webhookRequestsByIntervalLineChart {
+    max-width: 100%; /* Ensure the canvas takes full width */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 800px; /* Limit the height to keep it manageable */
+}
+
+#webhookRequestsByIntervalLineChart canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
 }
 
 .summary-card {
@@ -441,6 +462,20 @@ td {
 
 .close:hover,
 .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.close-receiver-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-receiver-modal:hover,
+.close-receiver-modal:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;
@@ -1183,7 +1218,49 @@ thead th {
     border-bottom: 1px solid #eee;
 }
 
+/*  */
+/* Webhook MGMT PAGE */
+/*  */
 
+.webhook-receivers-container {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 100%;
+}
+
+
+.webhook-receivers-table td {
+    border: none
+}
+
+.webhook-receivers th,
+.webhook-receivers td {
+    padding: 2px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.webhook-templates-container {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 100%;
+}
+
+
+.webhook-templates-table td {
+    border: none
+}
+
+.webhook-templates th,
+.webhook-templates td {
+    padding: 2px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
 
 button:disabled {
     background-color: #ccc;
@@ -1237,12 +1314,29 @@ cavas #User\ AgentsContainer {
     max-height: 300px;
 }
 
+/* Container for analysis summary and pie chart */
+.analysis-container {
+    display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px; /* Space between the summary and the pie chart */
+  width: 100%; /* Ensure the container takes full width */
+  }
+  
+  /* Style for the summary section */
+  .summary {
+    flex: 1;
+    /* Allow the summary to take up remaining space */
+  }
+
+/* Style for the pie chart */
 .metric-pie-chart {
-    height: 300px;
-    max-height: 500px;
-    width: 650px;
-    max-width: 1000px;
-}
+     flex: 0 0 500px;  
+    /* max-width: 1000px; */
+    /* height: 300px; */
+    min-height: 300px;
+    max-height: 300px;
+  }
 
 /* sortable tables */
 
@@ -1283,11 +1377,8 @@ th.th-sort-desc::after {
     /* Arrow up */
 }
 
-/* webhook receivers & templates */
 
-.webhook-receivers-container {
-    margin: 20px;
-}
+
 
 .sub-tabs {
     display: flex;
@@ -1325,3 +1416,28 @@ th.th-sort-desc::after {
 .sub-tab-content.active {
     display: block;
 }
+
+/* Style for the container holding the organization select and global timespan selector */
+.selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between the elements */
+    margin-bottom: 20px; /* Space below the container */
+  }
+  
+  /* Style for the global timespan selector */
+  .global-timespan-selector {
+    display: flex;
+    align-items: center;
+  }
+  
+  .global-timespan-selector label {
+    margin-right: 5px; /* Space between the label and the select box */
+  }
+  
+  /* Style for the select element to fit content */
+.global-timespan-selector select {
+    width: auto; /* Adjust width to fit content */
+    padding: 5px; /* Add some padding for better appearance */
+    font-size: 1em; /* Adjust font size if needed */
+  }
