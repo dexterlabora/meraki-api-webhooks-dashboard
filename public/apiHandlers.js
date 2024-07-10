@@ -3,17 +3,25 @@ class API {
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.headers = {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
+            "Authorization": `Bearer ${this.apiKey}`,
+            "Content-Type": 'application/json'
         };
     }
 
-    async fetch(url) {
+    async fetch(url, options) {
+        const op = options || {};
+        op.headers = { ...this.headers, ...(op.headers || {}) }; // Merge instance headers with request headers
         try {
-            const response = await fetch(url, { headers: this.headers });
+            const response = await fetch(url, {
+                method: op.method || 'GET', // Default to GET if method is not specified
+                headers: op.headers,
+                body: op.body, // Include the request body if present
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+
             return response.json();
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -44,12 +52,16 @@ class API {
         return this.fetch('/api/organizations');
     }
 
+    getOrganizationNetworks(organizationId) {
+        return this.fetch(`/api/organizations/${organizationId}/networks`);
+    }
+
     getOrganizationAdmins(organizationId) {
         return this.fetch(`/api/organizations/${organizationId}/admins`);
     }
 
     getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, timespanSeconds, queryParams = {}) {
-        console.log("getOrganizationApiRequestsOverviewResponseCodesByInterval", queryParams )
+        console.log("getOrganizationApiRequestsOverviewResponseCodesByInterval", queryParams)
         let url = `/api/organizations/${organizationId}/apiRequests/overview/responseCodes/byInterval?timespan=${timespanSeconds}`;
         if (queryParams.adminId) {
             url += `&adminIds[]=${queryParams.adminId}`;
@@ -63,10 +75,10 @@ class API {
         if (queryParams.sourceIp) {
             url += `&sourceIps[]=${queryParams.sourceIp}`;
         }
-        console.log("url",url);
+        console.log("url", url);
         return this.fetch(url); // Ensure this.fetch is properly implemented to handle the request
     }
-    
+
 
     // getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, timespanSeconds, userAgent) {
     //     let url = `/api/organizations/${organizationId}/apiRequests/overview/responseCodes/byInterval?timespan=${timespanSeconds}&userAgent=${userAgent}`;
@@ -98,23 +110,23 @@ class API {
     }
 
 
-    getAdministeredIdentitiesMe(){
+    getAdministeredIdentitiesMe() {
         return this.fetch(`/api/administered/identities/me`);
     }
 
     // Concept 
-    generateAdministeredIdentitiesMeApiKeys(){
-        const url =`/api/administered/identities/me/api/keys/generate`
+    generateAdministeredIdentitiesMeApiKeys() {
+        const url = `/api/administered/identities/me/api/keys/generate`
         return this.fetch(url);
     }
 
-    getAdministeredIdentitiesMeApiKeys(){
-        const url =`/api/administered/identities/me/api/keys`
+    getAdministeredIdentitiesMeApiKeys() {
+        const url = `/api/administered/identities/me/api/keys`
         return this.fetch(url);
     }
-    
-    getAdministeredIdentitiesMeApiKeysRevoke(suffix){
-        const url =`/api/administered/identities/me/api/keys/revoke/${suffix}`
+
+    getAdministeredIdentitiesMeApiKeysRevoke(suffix) {
+        const url = `/api/administered/identities/me/api/keys/revoke/${suffix}`
         return this.fetch(url);
     }
 
@@ -130,7 +142,6 @@ class API {
         const url = `/api/organizations/${organizationId}/webhooks/httpServers`;
         return this.fetch(url, {
             method: 'POST',
-            headers: { ...this.headers, 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
     }
@@ -146,7 +157,6 @@ class API {
         const url = `/api/organizations/${organizationId}/webhooks/httpServers/${httpServerId}`;
         return this.fetch(url, {
             method: 'PUT',
-            headers: { ...this.headers, 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
     }
@@ -155,8 +165,47 @@ class API {
     deleteOrganizationWebhooksHttpServer(organizationId, httpServerId) {
         const url = `/api/organizations/${organizationId}/webhooks/httpServers/${httpServerId}`;
         return this.fetch(url, {
+            method: 'DELETE'
+        });
+    }
+
+    // NETWORK 
+
+    // List the HTTP servers for an organization
+    getNetworkWebhooksHttpServers(networkId) {
+        const url = `/api/networks/${networkId}/webhooks/httpServers`;
+        return this.fetch(url);
+    }
+
+    // Add an HTTP server to an organization
+    createNetworkWebhooksHttpServer(networkId, data) {
+        const url = `/api/networks/${networkId}/webhooks/httpServers`;
+        return this.fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    // Return an HTTP server for an organization
+    getNetworkWebhooksHttpServer(networkId, httpServerId) {
+        const url = `/api/networks/${networkId}/webhooks/httpServers/${httpServerId}`;
+        return this.fetch(url);
+    }
+
+    // Update an HTTP server for an organization
+    updateNetworkWebhooksHttpServer(networkId, httpServerId, data) {
+        const url = `/api/networks/${networkId}/webhooks/httpServers/${httpServerId}`;
+        return this.fetch(url, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    // Delete an HTTP server from an organization
+    deleteNetworkWebhooksHttpServer(networkId, httpServerId) {
+        const url = `/api/networks/${networkId}/webhooks/httpServers/${httpServerId}`;
+        return this.fetch(url, {
             method: 'DELETE',
-            headers: this.headers
         });
     }
 
@@ -173,7 +222,6 @@ class API {
         const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates`;
         return this.fetch(url, {
             method: 'POST',
-            headers: { ...this.headers, 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
     }
@@ -189,7 +237,6 @@ class API {
         const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates/${payloadTemplateId}`;
         return this.fetch(url, {
             method: 'PUT',
-            headers: { ...this.headers, 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
     }
@@ -198,8 +245,7 @@ class API {
     deleteOrganizationWebhooksPayloadTemplate(organizationId, payloadTemplateId) {
         const url = `/api/organizations/${organizationId}/webhooks/payloadTemplates/${payloadTemplateId}`;
         return this.fetch(url, {
-            method: 'DELETE',
-            headers: this.headers
+            method: 'DELETE'
         });
     }
 

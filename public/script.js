@@ -146,6 +146,7 @@ function initializeEventListeners() {
         }
         localStorage.setItem('MerakiOrganizationId', organizationId);
         await fetchOrganizationAdmins(organizationId);
+        await fetchOrganizationNetworks(organizationId);
         updateVisualizationsForOrganization(organizationId);
     };
 
@@ -297,6 +298,7 @@ function fetchAndDisplayWebhookReceiversPage(content) {
         .then(html => {
             content.innerHTML = html;
             const api = new API(localStorage.getItem('MerakiApiKey'));
+            console.log('fetchAndDisplayWebhookReceiversPage')
             initWebhookReceivers(api);
         });
 
@@ -445,6 +447,28 @@ async function fetchOrganizationAdmins(organizationId) {
     } catch (error) {
         console.error('Error fetching organization admins:', error);
         alert('Failed to fetch organization admins.');
+    }
+}
+
+// Fetches and stores networks data for the selected organization
+async function fetchOrganizationNetworks(organizationId) {
+
+    console.log("fetching networks for ", organizationId);
+    const apiKey = localStorage.getItem('MerakiApiKey');
+    if (!apiKey || !organizationId) {
+        console.error("API Key and Organization ID must be set.");
+        return;
+    }
+    const api = new API(apiKey);
+
+    try {
+        const networks = await api.getOrganizationNetworks(organizationId);
+        // Save the networks data for later use
+        localStorage.setItem('networks', JSON.stringify(networks));
+        console.log('Networks fetched and stored:', networks);
+    } catch (error) {
+        console.error('Error fetching organization networks:', error);
+        alert('Failed to fetch networks.');
     }
 }
 

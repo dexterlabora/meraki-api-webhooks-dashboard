@@ -14,10 +14,33 @@
         }
     </style>
     <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
-        <h2>Webhook Receivers</h2>
-        <button id="addReceiverBtn">Add New Receiver</button>
+        <h2>Organization Receivers</h2>
+        <button id="addOrgReceiverBtn">Add Organization Receiver</button>
     </div>
-    <table id="webhookReceiversTable" class="webhook-receivers-table">
+    <table id="OrgWebhookReceiversTable" class="webhook-receivers-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th class="url-column">URL</th>
+                <th>Shared Secret</th>
+                <th>Payload Template</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamically filled by JavaScript -->
+        </tbody>
+    </table>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
+        <h2>Network Receivers</h2>
+        <div class="toolbar">
+            <select id="networkSelector">Network</select>
+            <button id="addNetReceiverBtn">Add Network Receiver</button>
+        </div>
+        
+    </div>
+    <table id="NetWebhookReceiversTable" class="webhook-receivers-table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -48,7 +71,7 @@
 
                 <label for="payloadTemplate">Payload Template:</label>
                 <select id="payloadTemplate" name="payloadTemplate">
-                    <option value="default">Meraki (included)</option>
+                    <option value="Meraki (included)">Meraki (included)</option>
                     <!-- Additional options will be populated here -->
                 </select>
 

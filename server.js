@@ -23,7 +23,7 @@ app.use(express.static(getStaticPath()));
 const mockMode = process.env.MOCK_MODE === 'true';
 
 // Generic proxy function for Meraki API requests
-async function proxyMerakiApiRequest(req, res, apiPath) {
+async function proxyMerakiApiRequest(req, res, apiPath, method) {
     const apiKey = req.headers.authorization;
     
     if (!apiKey) {
@@ -35,12 +35,22 @@ async function proxyMerakiApiRequest(req, res, apiPath) {
     try {
         console.log("proxy", url)
         console.log("apiKey", apiKey)
-        const response = await fetch(url, {
+        
+        const fetchOptions = {
+            method: method,
             headers: {
-                'Authorization': `${apiKey}`,
-                'User-Agent':'MerakiAPIMonitorMock CoryCreations'
+                'Authorization': apiKey,
+                'User-Agent': 'MerakiAPIMonitorMock CoryCreations',
+                'Content-Type': req.headers['content-type'] || 'application/json' // Include Content-Type header
             }
-        });
+        };
+
+        if (method === 'POST' || method === 'PUT') {
+            fetchOptions.body = JSON.stringify(req.body); // Include request body for POST and PUT requests
+        }
+
+        console.log("FETCH ",url, fetchOptions)
+        const response = await fetch(url, fetchOptions);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -48,7 +58,6 @@ async function proxyMerakiApiRequest(req, res, apiPath) {
 
         const data = await response.json();
         console.log("response", url, response.status)
-    // console.log("response data", data)
         res.send(data);
     } catch (error) {
         console.error('Error making API request to Meraki:', error);
@@ -57,13 +66,16 @@ async function proxyMerakiApiRequest(req, res, apiPath) {
 }
 
 // Dynamic routing to handle various API requests
-app.get('/api/*', (req, res) => {
+app.all('/api/*', (req, res) => {
     if (mockMode) {
         const mockFile = req.url.replace('/api/', '') + '.json';
         res.sendFile(`${__dirname}/mockData/${mockFile}`);
     } else {
         const apiPath = req.url.replace('/api', '');
-        proxyMerakiApiRequest(req, res, apiPath);
+        const method = req.method;
+        
+        // Proxy the request to Meraki API with the appropriate method
+        proxyMerakiApiRequest(req, res, apiPath, method);
     }
 });
 
