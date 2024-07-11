@@ -33,8 +33,6 @@ This tool leverages the following Meraki Dashboard API operations:
 4. Open `http://localhost:3000` in your web browser.
 
 
-
-
 ### Using the Dashboard
 1. Input your Cisco Meraki API key in the Credentials modal and save your settings.
 2. Select an organization to begin fetching relevant data.
