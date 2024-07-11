@@ -371,42 +371,7 @@ td {
     height: 100%;
 }
 
-.summary-card {
-    max-height: 850px;
-    /* Set the maximum height of the summary card */
-    max-width: 90%;
-    min-width: 40%;
-    overflow-y: scroll;
-    /* Allow vertical scrolling */
-    padding: 20px;
-}
 
-.summary-content {
-    font-size: 14px;
-}
-
-.summary-section {
-    margin-top: 10px;
-}
-
-.summary-label {
-    font-weight: bold;
-    color: #333;
-}
-
-.summary-section ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.summary-section ul li {
-    margin-bottom: 5px;
-}
-
-.summary-section strong {
-    display: block;
-    margin-bottom: 5px;
-}
 
 .code {
     background-color: #eee;
@@ -583,7 +548,6 @@ label {
 
 .card ul {
     text-align: left;
-    list-style: disc;
     padding: 0;
 }
 
@@ -973,6 +937,10 @@ thead th {
     /* Highlight failures in red */
 }
 
+.deprecated {
+    color: #ff6a00;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
     .metric-card {
@@ -1004,7 +972,6 @@ thead th {
 
 /* Styles for the list inside the expandable content */
 .expandable-content ul {
-    list-style-type: none;
     padding: 0;
     margin: 0;
 }
@@ -1317,26 +1284,103 @@ cavas #User\ AgentsContainer {
 /* Container for analysis summary and pie chart */
 .analysis-container {
     display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px; /* Space between the summary and the pie chart */
-  width: 100%; /* Ensure the container takes full width */
-  }
-  
-  /* Style for the summary section */
-  .summary {
-    flex: 1;
-    /* Allow the summary to take up remaining space */
-  }
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    max-height: 850px;
+    max-width: 90%;
+    min-width: 40%;
+}
 
-/* Style for the pie chart */
+.summary {
+    flex: 1;
+    margin-right: 20px;
+    overflow-y: auto;
+    max-height: 850px;
+    padding-right: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.summary-content {
+    font-size: 14px;
+}
+
+.summary-section {
+    margin-top: 10px;
+}
+
+.anomaly-list {
+    list-style-type: disc; /* Use disc for bullet points */
+    padding-left: 20px; /* Ensure there's padding for the bullet points */
+}
+
+.anomaly-list li {
+    margin-bottom: 8px;
+}
+
 .metric-pie-chart {
-     flex: 0 0 500px;  
-    /* max-width: 1000px; */
-    /* height: 300px; */
-    min-height: 300px;
-    max-height: 300px;
-  }
+    flex: 0 0 400px; /* Fixed width for the chart */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.metric-pie-chart canvas {
+    max-width: 400px;
+    max-height: 400px;
+}.analysis-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    max-height: 850px;
+    max-width: 90%;
+    min-width: 40%;
+}
+
+.summary {
+    flex: 1;
+    margin-right: 20px;
+    overflow-y: auto;
+    max-height: 850px;
+    padding-right: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.summary-content {
+    font-size: 14px;
+}
+
+.summary-section {
+    margin-top: 10px;
+}
+
+.anomaly-list {
+    list-style-type: disc; /* Use disc for bullet points */
+    padding-left: 20px; /* Ensure there's padding for the bullet points */
+}
+
+.anomaly-list li {
+    margin-bottom: 8px;
+}
+
+.metric-pie-chart {
+    flex: 0 0 400px; /* Fixed width for the chart */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.metric-pie-chart canvas {
+    max-width: 400px;
+    max-height: 400px;
+}
 
 /* sortable tables */
 

@@ -1,5 +1,6 @@
 //const apiRequestData = require("../mockData/getOrganizationApiRequests-sandbox.json")
 
+import fetchAndParseOpenAPISpec from './meraki-openapi-parser.js';
 
 
 // Helper Functions
@@ -73,7 +74,36 @@ function findLargestRequestBurst(requests) {
 
 
 // Main function to return API Request Metrics
-const apiRequestsMetrics = function apiRequestsMetrics(apiRequestData, merakiAdmins = []) {
+const apiRequestsMetrics = async function apiRequestsMetrics(apiRequestData, merakiAdmins = []) {
+    // Fetch the OpenAPI spec information
+    const operationsInfo = await fetchAndParseOpenAPISpec();
+   // console.log("operationsInfo ",operationsInfo);
+
+
+    // New function to identify deprecated and beta operations
+    const identifyDeprecatedAndBetaOperations = (metrics, operationsInfo) => {
+        const deprecatedOperations = [];
+        const betaOperations = [];
+
+        metrics["Operation IDs"].forEach(operation => {
+            const opInfo = operationsInfo.find(info => info.operationId === operation.name);
+            if (opInfo) {
+                if (opInfo.deprecated) {
+                    deprecatedOperations.push({
+                        ...operation,
+                        description: opInfo.description
+                    });
+                } else if (opInfo.tags.includes('beta')) {
+                    betaOperations.push({
+                        ...operation,
+                        description: opInfo.description
+                    });
+                }
+            }
+        });
+
+        return { deprecatedOperations, betaOperations };
+    };
 
     const convertToSortedArray = (patternObject) => {
         return Object.entries(patternObject).map(([key, counts]) => {
@@ -255,17 +285,36 @@ const apiRequestsMetrics = function apiRequestsMetrics(apiRequestData, merakiAdm
 
     const applicationsDetails = findAllUserAgentDetails(userAgentsCounts, apiRequestData, merakiAdmins);
 
-
+    // Convert the operation counts into the desired format and add metadata from operationsInfo
+    const operationsCounts = convertToSortedArray(operationIdCounts).map(operation => {
+        const opInfo = operationsInfo.find(info => info.operationId === operation.name);
+        return {
+            name: operation.name,
+            description: opInfo ? opInfo.description : '', // Insert description from parsed OpenAPI spec
+            success: operation.success,
+            failure: operation.failure,
+            successRate: operation.successRate,
+            deprecated: opInfo ? opInfo.deprecated : false
+        };
+    });
     // Update the metrics object to include the new "Applications" property
     const metrics = {
         "Admins": addAdminInfo(convertToSortedArray(adminIdCounts)),
         "User Agents": convertToSortedArray(userAgentsCounts),
+        "Operations": operationsCounts,
         "Operation IDs": convertToSortedArray(operationIdCounts),
         "Source IPs": convertToSortedArray(sourceIpCounts),
         "Busiest Hours": convertToSortedArray(hourlyCounts),
         "Busiest Days": convertToSortedArray(dailyCounts),
         "Applications": applicationsDetails,
     };
+
+    const { deprecatedOperations, betaOperations } = identifyDeprecatedAndBetaOperations(metrics, operationsInfo);
+
+    // Add new metrics for deprecated and beta operations
+    metrics["Deprecated Operations"] = deprecatedOperations;
+    metrics["Beta Operations"] = betaOperations;
+
 
     const detectAnomalies = (metrics, apiRequestData) => {
         let anomalies = [];
@@ -284,20 +333,55 @@ const apiRequestsMetrics = function apiRequestsMetrics(apiRequestData, merakiAdm
             }
         });
 
-        // Check for high failure rates in operations
-        metrics["Operation IDs"].forEach(operation => {
+
+            // Function to find user agents for a specific operation
+            const userAgentsForOperation = (operationName) => {
+                return metrics["Applications"].reduce((userAgents, app) => {
+                    const operation = app.operations.find(op => op.name === operationName);
+                    if (operation) {
+                        userAgents.push(app.userAgent);
+                    }
+                    return userAgents;
+                }, []);
+            };
+        metrics["Operations"].forEach(operation => {
             let rate = parseFloat(operation.successRate.replace('%', ''));
             if (rate < FAILURE_RATE_THRESHOLD) {
                 anomalies.push(`<b><code>${operation.name}</code></b> has a low success rate of <span class="rate-fail">${operation.successRate}</span>`);
             } else if (rate >= SUCCESS_RATE_THRESHOLD) {
                 successes.push(`Healthy operation detected: <b><code>${operation.name}</code></b>with a success rate of <span class="rate-success">${operation.successRate}</span>`);
             }
+    
+            if (operation.deprecated) {
+                anomalies.push(`Deprecated operation in use: <b><code>${operation.name}</code></b> (${operation.description}) by user agents: ${userAgentsForOperation(operation.name).join(', ')}`);
+            }
+
+        });
+
+        // // Check for high failure rates in operations
+        // metrics["Operation IDs"].forEach(operation => {
+        //     let rate = parseFloat(operation.successRate.replace('%', ''));
+        //     if (rate < FAILURE_RATE_THRESHOLD) {
+        //         anomalies.push(`<b><code>${operation.name}</code></b> has a low success rate of <span class="rate-fail">${operation.successRate}</span>`);
+        //     } else if (rate >= SUCCESS_RATE_THRESHOLD) {
+        //         successes.push(`Healthy operation detected: <b><code>${operation.name}</code></b>with a success rate of <span class="rate-success">${operation.successRate}</span>`);
+        //     }
+        // });
+
+        // // Check for usage of deprecated operations
+        // metrics["Deprecated Operations"].forEach(operation => {
+        //     anomalies.push(`Deprecated operation in use: <b><code>${operation.name}</code></b> (${operation.description})`);
+        // });
+
+        // Check for usage of beta operations
+        metrics["Beta Operations"].forEach(operation => {
+            anomalies.push(`Beta operation in use: <b><code>${operation.name}</code></b> (${operation.description})`);
         });
 
         // Check for unusual traffic in user agents
         metrics["User Agents"].forEach(userAgent => {
-          //  if (userAgent.success + userAgent.failure > TRAFFIC_THRESHOLD) {
-            if (userAgent.success  > TRAFFIC_THRESHOLD) {
+            //  if (userAgent.success + userAgent.failure > TRAFFIC_THRESHOLD) {
+            if (userAgent.success > TRAFFIC_THRESHOLD) {
                 anomalies.push(`<b>${truncateUserAgent(userAgent.name)}</b> is experiencing unusually high traffic with <b>${userAgent.success}</b> requests <b></b>`);
             } else {
                 successes.push(`<b>${truncateUserAgent(userAgent.name)}</b> is operating within reason.</b>`);
@@ -308,7 +392,7 @@ const apiRequestsMetrics = function apiRequestsMetrics(apiRequestData, merakiAdm
         // metrics["User Agents"].forEach(userAgent => {
         //     const userAgentRequests = apiRequestData.filter(request => request.userAgent === userAgent.name);
         //     const burstRate = findLargestRequestBurst(userAgentRequests);
-        
+
         //     if (burstRate > RATE_LIMIT_PER_SECOND) {
         //         anomalies.push(`<b>${truncateUserAgent(userAgent.name)}</b> may hit rate limits with bursts up to ${burstRate.toFixed(2)} requests per second.`);
         //     } else {
@@ -351,3 +435,5 @@ const apiRequestsMetrics = function apiRequestsMetrics(apiRequestData, merakiAdm
     return metrics;
 };
 
+
+export default apiRequestsMetrics;

@@ -1,8 +1,9 @@
 // Constants and State
-const MAX_PAGE_LIMIT = 3; // Default max pages to paginate API
+const MAX_PAGE_LIMIT = 2; // Default max pages to paginate API
 
 import API from './apiHandlers.js';
 import apiRequestsMetricsViz from './apiRequestsMetricsViz.js';
+import apiRequestsMetrics from './apiRequestsMetrics.js';
 import webhookMetricsViz from './webhookMetricsViz.js';
 import updateWebhookHistoryChart from './webhookHistoryChart.js';
 import updateWebhookHistoryByIntervalSuccessFailChart from './webhookHistoryByIntervalSuccessFailChart.js';
@@ -44,7 +45,7 @@ function handleConfigFormSubmit(event) {
     event.preventDefault();
     const apiKey = apiKeyInput.value;
     if (!apiKey) {
-        alert("API Key is required!");
+        displayNotification("API Key is required!");
         return;
     }
     localStorage.setItem('MerakiApiKey', apiKey);
@@ -126,8 +127,7 @@ function initializeEventListeners() {
     configToggle.onclick = () => configModal.style.display = 'block';
     closeModal.onclick = () => configModal.style.display = 'none';
     window.onclick = (event) => {
-        console.log("closeModal onclick event")
-        console.log("closeModal onclick event.target", event.target)
+
         if (event.target === configModal) {
             configModal.style.display = 'none';
         }
@@ -141,7 +141,7 @@ function initializeEventListeners() {
     organizationSelect.onchange = async function () {
         const organizationId = this.value;
         if (!organizationId) {
-            alert("Organization ID is required!");
+            displayNotification("Organization ID is required!");
             return;
         }
         localStorage.setItem('MerakiOrganizationId', organizationId);
@@ -151,7 +151,7 @@ function initializeEventListeners() {
     };
 
     // Event listener for global timespan selector
-    globalTimespanSelect.addEventListener('change', () => {
+    document.getElementById('globalTimespanSelect').addEventListener('change', () => {
         const timespanSeconds = getTimespanInSeconds(globalTimespanSelect.value);
         fetchApiDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
         fetchWebhooksDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
@@ -394,7 +394,7 @@ async function fetchOrganizations() {
     const apiKey = apiKeyInput.value;
     if (!apiKey) {
         console.error("API Key must be set.");
-        alert('API Key is required.');
+        displayNotification('API Key is required.');
         return;
     }
     const api = new API(apiKey);
@@ -423,7 +423,7 @@ async function fetchOrganizations() {
         hideLoader();
     } catch (error) {
         console.error('Error fetching organizations:', error);
-        alert('Failed to fetch organizations. Check console for details.');
+        displayNotification('Failed to fetch organizations. Check console for details.');
         hideLoader();
     }
 }
@@ -446,7 +446,7 @@ async function fetchOrganizationAdmins(organizationId) {
         console.log('Admins fetched and stored:', admins);
     } catch (error) {
         console.error('Error fetching organization admins:', error);
-        alert('Failed to fetch organization admins.');
+        displayNotification('Failed to fetch organization admins.');
     }
 }
 
@@ -468,13 +468,13 @@ async function fetchOrganizationNetworks(organizationId) {
         console.log('Networks fetched and stored:', networks);
     } catch (error) {
         console.error('Error fetching organization networks:', error);
-        alert('Failed to fetch networks.');
+        displayNotification('Failed to fetch networks.');
     }
 }
 
 // Main function to load API Request and Response Code data
 async function fetchApiDataAndUpdateVis(apiKey, organizationId, timespanSeconds) {
-    console.log("fetchApiDataAndUpdateVis timespanSeconds", timespanSeconds)
+    console.log("fetchApiDataAndUpdateVis timespanSeconds", timespanSeconds);
     showLoader();
     const api = new API(apiKey);
 
@@ -484,16 +484,16 @@ async function fetchApiDataAndUpdateVis(apiKey, organizationId, timespanSeconds)
             api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, timespanSeconds),
             api.getOrganizationApiRequests(organizationId, timespanSeconds, 1000).fetchAllPages(MAX_PAGE_LIMIT)
         ]);
+
         console.log("apiRequestsOverviewData", apiRequestsOverviewData);
         console.log("responseCodesData", responseCodesData);
         console.log("apiRequestsData", apiRequestsData);
-
 
         updateApiRequestHero(apiRequestsOverviewData);
         updateApiRequestsChart(responseCodesData, timespanSeconds);
         updateApiRequestsSuccessFailChart(responseCodesData, timespanSeconds);
         updateApiRequestTable(apiRequestsData);
-        const apiRequestMetricsData = apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins')));
+        const apiRequestMetricsData = await apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins')));
         console.log("apiRequestMetricsData", apiRequestMetricsData);
 
         apiRequestsMetricsViz(apiRequestMetricsData);
@@ -503,18 +503,20 @@ async function fetchApiDataAndUpdateVis(apiKey, organizationId, timespanSeconds)
         console.log("API Requests Data and Visualizations Updated");
     } catch (error) {
         console.error("Error fetching API requests data:", error);
+        const errorDetails =  error.message.error || error | 'An unexpected error occurred.';
+        displayNotification(`Error fetching API data: \n Error: ${error.status} \n ${errorDetails}`);
     } finally {
         hideLoader();
     }
 }
 
-// Main function to load Webhook data
 async function fetchWebhooksDataAndUpdateVis(apiKey, organizationId, timespanSeconds) {
     showLoader();
     const api = new API(apiKey);
     try {
-        webhookLogsData = await api.getOrganizationWebhooksLogs(organizationId, timespanSeconds, 1000).fetchAllPages(5) //.fetchAllPages(MAX_PAGE_LIMIT);
+        webhookLogsData = await api.getOrganizationWebhooksLogs(organizationId, timespanSeconds, 1000).fetchAllPages(5);
         console.log("webhookLogsData", webhookLogsData);
+
         updateWebhookHero(webhookLogsData);
         updateWebhookHistoryChart(webhookLogsData, timespanSeconds);
         updateWebhookHistoryByIntervalSuccessFailChart(webhookLogsData, timespanSeconds);
@@ -525,15 +527,16 @@ async function fetchWebhooksDataAndUpdateVis(apiKey, organizationId, timespanSec
         const httpServerStats = calculateHttpServerStats(webhookLogsData);
         updateHttpServerStats(httpServerStats);
         setupTableSortListeners("#webhookLogsTable");
+
         console.log("Webhooks Data and Visualizations Updated");
     } catch (error) {
         console.error("Error fetching webhooks data:", error);
+        const errorDetails =  error.message.error || 'An unexpected error occurred.';
+        displayNotification(`Error fetching Webhook data: \n Error: ${error.status} \n ${errorDetails}`);
     } finally {
         hideLoader();
     }
 }
-
-
 
 // Utility Functions
 function showLoader() {
@@ -753,7 +756,7 @@ async function updateDashboardWithFilters() {
     const organizationId = localStorage.getItem('MerakiOrganizationId');
 
     if (!apiKey || !organizationId) {
-        alert("Configure API settings first.");
+        displayNotification("Configure API settings first.");
         return;
     }
 
@@ -771,7 +774,7 @@ async function updateDashboardWithFilters() {
         updateApiRequestsSuccessFailChart(responseCodesData, timespanSeconds);
     } catch (error) {
         console.error('Error updating chart:', error);
-        alert('Failed to update the chart based on the selected filters.');
+        displayNotification('Failed to update the chart based on the selected filters.');
     } finally {
         hideLoader();
     }
@@ -867,6 +870,15 @@ function calculateHttpServerStats(webhookLogsData) {
 
     // Convert stats into an array and sort by hostname
     return Object.values(stats).sort((a, b) => a.hostname.localeCompare(b.hostname));
+}
+
+function displayNotification(message) {
+    const notificationBanner = document.getElementById('notificationBanner');
+    notificationBanner.textContent = message;
+    notificationBanner.style.display = 'block';
+    setTimeout(() => {
+        notificationBanner.style.display = 'none';
+    }, 5000); // Hide the notification after 5 seconds
 }
 
 // Start the application

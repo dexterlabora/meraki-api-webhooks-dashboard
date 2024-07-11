@@ -18,23 +18,11 @@
 
 
   <div class="selector-container">
-  <!-- Organization Select -->
-  <label for="organizationSelect">Organization:</label>
-  <select id="organizationSelect" required>
-    <option value="">Select Organization</option>
-  </select>
-
-      <!-- Global Timespan Selector -->
-      
-    <div class="global-timespan-selector">
-      <label for="globalTimespanSelect">Timespan:</label>
-      <select id="globalTimespanSelect">
-        <option value="twoHours">Last 2 Hours</option>
-        <option value="day" selected>Last Day</option>
-        <option value="week">Last Week</option>
-        <option value="month">Last Month</option>
-      </select>
-    </div>
+    <!-- Organization Select -->
+    <label for="organizationSelect">Organization:</label>
+    <select id="organizationSelect" required>
+      <option value="">Select Organization</option>
+    </select>
   </div>
 
 
@@ -56,7 +44,10 @@
   <div>
     <h1>API & Webhooks</h1>
 
-    <div class="tabs"> <!-- Top-level tabs -->
+    <div id="notificationBanner" style="display: none; background-color: #ffcccc; color: #333; padding: 5px 10px; border-radius: 5px;"></div>
+   
+    <!-- Top-level tabs -->
+    <div class="tabs">
       <button class="tab" id="overviewTab">Overview</button>
       <button class="tab" id="apiManagementTab">API Management</button>
       <button class="tab" id="webhookManagementTab">Webhook Management</button>
@@ -64,7 +55,26 @@
 
     <!-- Overview Section -->
     <div id="overviewTabSection" class="top-level-content">
-      <h2>Overview</h2>
+
+          <div class="timespan-header">
+            <h2>Overview</h2>
+            <div class="timespan-header">
+  
+              <div id="globalTimespanSelect" class="timespan">
+                <label for="globalTimespanSelect"></label>
+                <select id="globalTimespanSelect">
+                  <option value="twoHours">Last 2 Hours</option>
+                  <option value="day" selected>Last Day</option>
+                  <option value="week">Last Week</option>
+                  <option value="month">Last Month</option>
+                </select>
+               </div>
+            </div>
+
+
+        </div>
+     
+
       <!-- Hero -->
       <div class="visualization" id="heroViz">
         <div id="apiSummary" class="api-summary">
@@ -109,32 +119,34 @@
 
         <div class="api-summary">
 
-          <div class="api-summary-item card" >
+          <div class="api-summary-item card">
             <div class="card-content ">
               <h2>API Requests</h2>
               <div class="api-summary-item card"">
-                <canvas id="apiRequestsByIntervalLineChart"></canvas>     
+                <canvas id="apiRequestsByIntervalLineChart"></canvas>
               </div>
-             <div>
-              <button id="apiMetricsBtnShortcut" style="font-size: smaller; max-width:130px; padding:5px; float: right;">
-                View Metric Details
-              </button>
-            </div>
+              <div>
+                <button id="apiMetricsBtnShortcut"
+                  style="font-size: smaller; max-width:130px; padding:5px; float: right;">
+                  View Metric Details
+                </button>
+              </div>
             </div>
           </div>
 
-          <div class="api-summary-item card" >
+          <div class="api-summary-item card">
             <div class="card-content ">
               <h2>Webhook Requests</h2>
               <div class="api-summary-item card"">
                 <canvas id="webhookRequestsByIntervalLineChart"></canvas>
-                
+
               </div>
-             <div>
-              <button id="webhookMetricsBtnShortcut" style="font-size: smaller; max-width:130px; padding:5px; float: right;">
-                View Metric Details
-              </button>
-            </div>
+              <div>
+                <button id="webhookMetricsBtnShortcut"
+                  style="font-size: smaller; max-width:130px; padding:5px; float: right;">
+                  View Metric Details
+                </button>
+              </div>
             </div>
           </div>
 
@@ -149,12 +161,12 @@
             </div>
           </div>
         </div>
-</div>
+      </div>
 
 
 
-        <!-- Visualization 1: API Requests Grouped by Response Code -->
-        <!-- <div class="visualization" id="apiRequestsTable">
+      <!-- Visualization 1: API Requests Grouped by Response Code -->
+      <!-- <div class="visualization" id="apiRequestsTable">
         <div class="header-bar">
           <h2>API Requests by Response Code</h2>
 
@@ -179,44 +191,44 @@
       </div> -->
 
 
+    </div>
+
+    <!-- API Management -->
+
+    <div id="apiManagementTabSection" class="top-level-content">
+
+      <h2>API</h2>
+      <div class="sub-tabs"> <!-- Sub-tabs -->
+        <button class="tab sub-tab active" id="apiMetricsTab">Metrics</button>
+        <button class="tab sub-tab" id="apiHistoryTab">History</button>
+        <button class="tab sub-tab" id="apiKeysTab">API keys and access</button>
+
       </div>
 
-      <!-- API Management -->
-
-      <div id="apiManagementTabSection" class="top-level-content">
-
-        <h2>API</h2>
-        <div class="sub-tabs"> <!-- Sub-tabs -->
-          <button class="tab sub-tab active" id="apiMetricsTab">Metrics</button>
-          <button class="tab sub-tab" id="apiHistoryTab">History</button>
-          <button class="tab sub-tab" id="apiKeysTab">API keys and access</button>
-
-        </div>
 
 
+      <div id="apiMetricsTabSection" class="sub-tab-content active">
 
-        <div id="apiMetricsTabSection" class="sub-tab-content active">
-
+        <div class="timespan-header">
+          <h2>Metrics</h2>
           <div class="timespan-header">
-            <h2>Metrics</h2>
-            <div class="timespan-header">
 
-              <div id="apiRequestsTimespan" class="timespan">
-                <label for="apiRequestsTimespanSelect"></label>
-                <select id="apiRequestsTimespanSelect">
-                  <option value="twoHours">Last 2 Hours</option>
-                  <option value="day" selected>Last Day</option>
-                  <option value="week">Last Week</option>
-                  <option value="month">Last Month</option>
-                </select>
+            <div id="apiRequestsTimespan" class="timespan">
+              <label for="apiRequestsTimespanSelect"></label>
+              <select id="apiRequestsTimespanSelect">
+                <option value="twoHours">Last 2 Hours</option>
+                <option value="day" selected>Last Day</option>
+                <option value="week">Last Week</option>
+                <option value="month">Last Month</option>
+              </select>
 
-                <span id="apiRequestsStartDate"></span> to
-                <span id="apiRequestsEndDate"></span>
-              </div>
+              <span id="apiRequestsStartDate"></span> to
+              <span id="apiRequestsEndDate"></span>
             </div>
           </div>
+        </div>
 
-                  <!-- Visualization 1: API Requests Grouped by Response Code -->
+        <!-- Visualization 1: API Requests Grouped by Response Code -->
         <div class="visualization" id="apiRequestsTable">
           <div class="header-bar">
             <h2>Requests by Response Code</h2>
@@ -241,218 +253,219 @@
           <canvas id="apiRequestsChart"></canvas>
         </div>
 
-          <!-- API Request Metrics -->
-          <div class="visualization" id="apiMetricsSection">
-            <h2>Analysis</h2>
-            <div id="apiMetricsContainer" class="metrics-container">
-              <!-- Metrics cards will be inserted here by the displayMetrics function -->
-            </div>
+        <!-- API Request Metrics -->
+        <div class="visualization" id="apiMetricsSection">
+          <h2>Analysis</h2>
+          <div id="apiMetricsContainer" class="metrics-container">
+            <!-- Metrics cards will be inserted here by the displayMetrics function -->
           </div>
-
-        </div>
-
-        <!-- Request History Table with Filters -->
-        <div id="apiHistoryTabSection" class="sub-tab-content">
-          <div class="visualization" id="viz3">
-            <h2>API Request History</h2>
-            <div class="scrollable-table-wrapper">
-              <table id="apiRequestTable" class="scrollable-table ">
-                <thead>
-                  <tr>
-                    <th>
-                      Timestamp <br /><input type="text" onkeyup="filterTable(this, 0)" />
-                    </th>
-                    <th>
-                      Admin<br /><input type="text" onkeyup="filterTable(this, 1)" />
-                    </th>
-                    <th>
-                      Operation ID <br /><input type="text" onkeyup="filterTable(this, 2)" />
-                    </th>
-                    <th>
-                      Source IP <br /><input type="text" onkeyup="filterTable(this, 3)" />
-                    </th>
-                    <th>
-                      Response Code <br /><input type="text" onkeyup="filterTable(this, 4)" />
-                    </th>
-                    <th>
-                      User Agent <br /><input type="text" onkeyup="filterTable(this, 5)" />
-                    </th>
-                    <th>
-                      Path <br /><input type="text" onkeyup="filterTable(this, 6)" />
-                    </th>
-                    <th>
-                      Query <br /><input type="text" onkeyup="filterTable(this, 7)" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Data rows will be populated here -->
-                </tbody>
-              </table>
-            </div>
-
-            <div id="totalApiRequests">
-              <p><b>Total Records:</b> <span id="totalApiRecords">0</span></p>
-            </div>
-          </div>
-        </div>
-
-        <div id="apiKeysTabSection" class="sub-tab-content">
-          <!-- Content for API Keys -->
         </div>
 
       </div>
 
-      <div id="webhookManagementTabSection" class="top-level-content">
-        <h2>Webhooks</h2>
-        <!-- Content for Webhook Management -->
-        <div class="sub-tabs"> <!-- Sub-tabs -->
-          <button class="tab sub-tab active" id="webhookMetricsTab">Metrics</button>
-          <button class="tab sub-tab" id="webhookHistoryTab">History</button>
-          <button class="tab sub-tab" id="webhookReceiversTab">Receivers</button>
-          <button class="tab sub-tab" id="webhookTemplatesTab">Templates</button>
-
-        </div>
-
-        <div id="webhookReceiversTabSection" class="sub-tab-content">
-          <!-- dynamic HTML content for webhook receivers here -->
-        </div>
-
-        <div id="webhookTemplatesTabSection" class="sub-tab-content">
-          <!-- dynamic  HTML content for webhook templates here -->
-        </div>
-
-        <div id="webhookMetricsTabSection" class="sub-tab-content">
-          <!-- Timespan Selector -->
-          <div class="timespan-header">
-            <h2>Metrics</h2>
-
-            <span id="webhooksTimespan">
-              <select id="webhooksTimespanSelect">
-                <option value="twoHours">Last 2 Hours</option>
-                <option value="day" selected>Last Day</option>
-                <option value="week">Last Week</option>
-                <option value="month">Last Month</option>
-              </select>
-              <span id="webhooksStartDate"></span> to
-              <span id="webhooksEndDate"></span>
-            </span>
-          </div>
-          <div class="visualization" id="viz4">
-            <!-- Visualization for Webhook History By URL -->
-            <div class="visualization" id="webhookHistoryByAlertTypeByUrl">
-              <h2>Webhooks By Response Code</h2>
-              <!-- Webhooks Chart -->
-              <div class="filter-bar">
-                <!-- URL Selector for Filtering Webhooks -->
-                <label for="urlSelect">Filter by URL:</label>
-                <select id="urlSelect">
-                  <option value="">All URLs</option>
-                  <!-- Additional options will be populated dynamically by JavaScript -->
-                </select>
-              </div>
-              <canvas id="webhookHistoryChart"></canvas>
-            </div>
-
-            <!-- Visualization for Webhook History By Alert Type -->
-            <div class="visualization" id="webhookHistoryByAlertType">
-              <h2>Webhooks By Alert Type</h2>
-              <!-- <select id="alertTypeSelect">
-                  <option value="">All Alert Types</option>
-                </select> -->
-              <canvas id="webhookHistoryByAlertTypeChart"></canvas>
-            </div>
-
-            <!-- HTTP Servers Stats -->
-            <div id="httpServersStats">
-              <div class="http-servers-stats-container">
-                Loading...
-                <!-- Stats will be inserted here-->
-              </div>
-            </div>
-
-
-
-          </div>
-
-          <div class="visualization">
-            <h2>Webhook Metrics & Analysis</h2>
-            <div id="webhookMetricsContainer" class="metrics-container">
-              <!-- Metrics cards will be inserted here by the displayMetrics function -->
-            </div>
-          </div>
-
-
-
-        </div>
-
-
-        <div id="webhookHistoryTabSection" class="sub-tab-content">
-          <h2>Webhook History</h2>
+      <!-- Request History Table with Filters -->
+      <div id="apiHistoryTabSection" class="sub-tab-content">
+        <div class="visualization" id="viz3">
+          <h2>API Request History</h2>
           <div class="scrollable-table-wrapper">
-            <table id="webhookLogsTable" class="scrollable-table">
+            <table id="apiRequestTable" class="scrollable-table ">
               <thead>
                 <tr>
                   <th>
-                    Logged At <br /><input type="text" onkeyup="filterTable(this, 0)" />
+                    Timestamp <br /><input type="text" onkeyup="filterTable(this, 0)" />
                   </th>
                   <th>
-                    Network ID <br /><input type="text" onkeyup="filterTable(this, 1)" />
+                    Admin<br /><input type="text" onkeyup="filterTable(this, 1)" />
                   </th>
                   <th>
-                    Alert Type <br /><input type="text" onkeyup="filterTable(this, 2)" />
+                    Operation ID <br /><input type="text" onkeyup="filterTable(this, 2)" />
                   </th>
                   <th>
-                    Response Code <br /><input type="text" onkeyup="filterTable(this, 3)" />
+                    Source IP <br /><input type="text" onkeyup="filterTable(this, 3)" />
                   </th>
                   <th>
-                    Response Duration <br /><input type="text" onkeyup="filterTable(this, 4)" />
+                    Response Code <br /><input type="text" onkeyup="filterTable(this, 4)" />
                   </th>
                   <th>
-                    URL <br /><input type="text" onkeyup="filterTable(this, 5)" />
+                    User Agent <br /><input type="text" onkeyup="filterTable(this, 5)" />
+                  </th>
+                  <th>
+                    Path <br /><input type="text" onkeyup="filterTable(this, 6)" />
+                  </th>
+                  <th>
+                    Query <br /><input type="text" onkeyup="filterTable(this, 7)" />
                   </th>
                 </tr>
               </thead>
-              <tbody id="webhookLogsBody">
+              <tbody>
                 <!-- Data rows will be populated here -->
               </tbody>
             </table>
           </div>
-          <div id="totalWebhookLogs">
-            <p><b>Total Records:</b> <span id="totalWebhookRecords">0</span></p>
+
+          <div id="totalApiRequests">
+            <p><b>Total Records:</b> <span id="totalApiRecords">0</span></p>
           </div>
         </div>
       </div>
 
+      <div id="apiKeysTabSection" class="sub-tab-content">
+        <!-- Content for API Keys -->
+      </div>
+
     </div>
 
+    <div id="webhookManagementTabSection" class="top-level-content">
+      <h2>Webhooks</h2>
+      <!-- Content for Webhook Management -->
+      <div class="sub-tabs"> <!-- Sub-tabs -->
+        <button class="tab sub-tab active" id="webhookMetricsTab">Metrics</button>
+        <button class="tab sub-tab" id="webhookHistoryTab">History</button>
+        <button class="tab sub-tab" id="webhookReceiversTab">Receivers</button>
+        <button class="tab sub-tab" id="webhookTemplatesTab">Templates</button>
+
+      </div>
+
+      <div id="webhookReceiversTabSection" class="sub-tab-content">
+        <!-- dynamic HTML content for webhook receivers here -->
+      </div>
+
+      <div id="webhookTemplatesTabSection" class="sub-tab-content">
+        <!-- dynamic  HTML content for webhook templates here -->
+      </div>
+
+      <div id="webhookMetricsTabSection" class="sub-tab-content">
+        <!-- Timespan Selector -->
+        <div class="timespan-header">
+          <h2>Metrics</h2>
+
+          <span id="webhooksTimespan">
+            <select id="webhooksTimespanSelect">
+              <option value="twoHours">Last 2 Hours</option>
+              <option value="day" selected>Last Day</option>
+              <option value="week">Last Week</option>
+              <option value="month">Last Month</option>
+            </select>
+            <span id="webhooksStartDate"></span> to
+            <span id="webhooksEndDate"></span>
+          </span>
+        </div>
+        <div class="visualization" id="viz4">
+          <!-- Visualization for Webhook History By URL -->
+          <div class="visualization" id="webhookHistoryByAlertTypeByUrl">
+            <h2>Webhooks By Response Code</h2>
+            <!-- Webhooks Chart -->
+            <div class="filter-bar">
+              <!-- URL Selector for Filtering Webhooks -->
+              <label for="urlSelect">Filter by URL:</label>
+              <select id="urlSelect">
+                <option value="">All URLs</option>
+                <!-- Additional options will be populated dynamically by JavaScript -->
+              </select>
+            </div>
+            <canvas id="webhookHistoryChart"></canvas>
+          </div>
+
+          <!-- Visualization for Webhook History By Alert Type -->
+          <div class="visualization" id="webhookHistoryByAlertType">
+            <h2>Webhooks By Alert Type</h2>
+            <!-- <select id="alertTypeSelect">
+                  <option value="">All Alert Types</option>
+                </select> -->
+            <canvas id="webhookHistoryByAlertTypeChart"></canvas>
+          </div>
+
+          <!-- HTTP Servers Stats -->
+          <div id="httpServersStats">
+            <div class="http-servers-stats-container">
+              Loading...
+              <!-- Stats will be inserted here-->
+            </div>
+          </div>
+
+
+
+        </div>
+
+        <div class="visualization">
+          <h2>Webhook Metrics & Analysis</h2>
+          <div id="webhookMetricsContainer" class="metrics-container">
+            <!-- Metrics cards will be inserted here by the displayMetrics function -->
+          </div>
+        </div>
+
+
+
+      </div>
+
+
+      <div id="webhookHistoryTabSection" class="sub-tab-content">
+        <h2>Webhook History</h2>
+        <div class="scrollable-table-wrapper">
+          <table id="webhookLogsTable" class="scrollable-table">
+            <thead>
+              <tr>
+                <th>
+                  Logged At <br /><input type="text" onkeyup="filterTable(this, 0)" />
+                </th>
+                <th>
+                  Network ID <br /><input type="text" onkeyup="filterTable(this, 1)" />
+                </th>
+                <th>
+                  Alert Type <br /><input type="text" onkeyup="filterTable(this, 2)" />
+                </th>
+                <th>
+                  Response Code <br /><input type="text" onkeyup="filterTable(this, 3)" />
+                </th>
+                <th>
+                  Response Duration <br /><input type="text" onkeyup="filterTable(this, 4)" />
+                </th>
+                <th>
+                  URL <br /><input type="text" onkeyup="filterTable(this, 5)" />
+                </th>
+              </tr>
+            </thead>
+            <tbody id="webhookLogsBody">
+              <!-- Data rows will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        <div id="totalWebhookLogs">
+          <p><b>Total Records:</b> <span id="totalWebhookRecords">0</span></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 
 
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-date-fns/3.0.0/chartjs-adapter-date-fns.min.js"
-      integrity="sha512-rwTcVAtpAmT3KnwlKHOqeV7ETOTUdf0uYbR4YGf3149X+X+Rx3tgJOOhqFVsyNl0oMgJSPqAOoFuf57WNN0RYA=="
-      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-date-fns/3.0.0/chartjs-adapter-date-fns.min.js"
+    integrity="sha512-rwTcVAtpAmT3KnwlKHOqeV7ETOTUdf0uYbR4YGf3149X+X+Rx3tgJOOhqFVsyNl0oMgJSPqAOoFuf57WNN0RYA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- Custom Modules -->
-    <script type="module" src="apiRequestsMetricsViz.js"></script>
-    <script src="apiRequestsMetrics.js"></script>
-    <script type="module" src="webhookHistoryChart.js"></script>
-    <script type="module" src="webhookHistoryByAlertTypeChart.js"></script>
-    <script type="module" src="webhookMetrics.js"></script>
-    <script type="module" src="webhookMetricsViz.js"></script>
-    <script type="module" src="apiHandlers.js"></script>
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <!-- Main Script -->
-    <script type="module" src="script.js"></script>
-    <!-- <script type="module" src="webhookReceivers.js"></script> -->
-    <a class="footer" href="https://forms.gle/KRW3nSp5hB6yYtF46" target="_blank">Submit you feedback!</a>
+  <!-- Custom Modules -->
+  <script type="module" src="apiRequestsMetricsViz.js"></script>
+  <script type="module" src="apiRequestsMetrics.js"></script>
+  <script type="module" src="webhookHistoryChart.js"></script>
+  <script type="module" src="webhookHistoryByAlertTypeChart.js"></script>
+  <script type="module" src="webhookMetrics.js"></script>
+  <script type="module" src="webhookMetricsViz.js"></script>
+  <script type="module" src="apiHandlers.js"></script>
+  <script type="module" src="meraki-openapi-parser.js"></script>
+
+  <!-- Main Script -->
+  <script type="module" src="script.js"></script>
+  <!-- <script type="module" src="webhookReceivers.js"></script> -->
+  <a class="footer" href="https://forms.gle/KRW3nSp5hB6yYtF46" target="_blank">Submit you feedback!</a>
 </body>
 
 </html>

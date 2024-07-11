@@ -11,7 +11,8 @@
     "build-mac": "electron-builder --mac --publish 'always' ",
     "build-mac2":"electron-builder --mac --x64 --arm64 --publish 'onTagOrDraft'",
     "build-all": "electron-builder -mw --publish 'always' && npm run move-binaries",
-    "move-binaries": "cp build/*.exe dist/ && cp build/*.dmg dist/"
+    "move-binaries": "cp build/*.exe dist/ && cp build/*.dmg dist/",
+    "publish-github": "electron-builder --publish always"
 
   },
   "keywords": [
@@ -53,5 +54,15 @@
     "directories": {
       "output": "build"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dexterlabora/meraki-api-webhooks-dashboard.git"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "dexterlabora",
+    "repo": "meraki-api-webhooks-dashboard",
+    "token": "${{ secrets.electron_deploy }}"
   }
 }

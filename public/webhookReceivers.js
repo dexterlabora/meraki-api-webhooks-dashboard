@@ -13,6 +13,7 @@ function initWebhookReceiversListeners() {
     const form = document.getElementById('receiverForm');
     const networkSelector = document.querySelector('.toolbar select');
 
+
     // Open modal for adding new receiver
     addOrgReceiverBtn.addEventListener('click', () => {
         form.reset(); // Reset form for new entry
@@ -85,11 +86,31 @@ function initWebhookReceiversListeners() {
         const selectedNetwork = networkSelector.value;
         loadWebhookReceiversForNetwork(api, selectedNetwork);
     });
+
+    // Call the function to populate payload templates on page load
+    populatePayloadTemplates(api);
 }
+
+    // Function to populate the payload template options
+    function populatePayloadTemplates(api) {
+        const payloadTemplateSelect = document.getElementById('payloadTemplate');
+
+        const organizationId = localStorage.getItem('MerakiOrganizationId')
+        api.getOrganizationWebhooksPayloadTemplates(organizationId) // Replace organizationId with the actual organization ID
+            .then(payloadTemplates => {
+                payloadTemplates.forEach(template => {
+                    const option = document.createElement('option');
+                    option.value = template.id; // Set the value to the template ID or any unique identifier
+                    option.textContent = template.name; // Display the template name
+                    payloadTemplateSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching payload templates:', error));
+    }
 
 // Function to load webhook data
 function loadWebhookReceivers(api) {
-    console.log("loadWebhookReceivers");
+   // console.log("loadWebhookReceivers");
     const document = window.document;
     const organizationId = localStorage.getItem('MerakiOrganizationId');
     api.getOrganizationWebhooksHttpServers(organizationId)

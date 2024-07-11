@@ -1,16 +1,35 @@
 <div class="webhook-receivers-container">
     <style>
         .webhook-receivers-table {
-            width: 100%; /* Ensures the table uses the full width */
-            table-layout: fixed; /* Helps in applying fixed widths to columns */
+            width: 100%;
+            /* Ensures the table uses the full width */
+            table-layout: fixed;
+            /* Helps in applying fixed widths to columns */
         }
-        .webhook-receivers-table th, .webhook-receivers-table td {
-            overflow: hidden; /* Prevents text from spilling out of cells */
+
+        .webhook-receivers-table th,
+        .webhook-receivers-table td {
+            overflow: hidden;
+            /* Prevents text from spilling out of cells */
         }
+
         .webhook-receivers-table .url-column {
-            width: 400px; /* Fixed width for the URL column */
-            overflow-x: auto; /* Enables horizontal scrolling within the cell */
-            white-space: nowrap; /* Ensures the content stays in a single line */
+            width: 400px;
+            /* Fixed width for the URL column */
+            overflow-x: auto;
+            /* Enables horizontal scrolling within the cell */
+            white-space: nowrap;
+            /* Ensures the content stays in a single line */
+        }
+
+        .modal-content {
+            position: relative;
+        }
+
+        #saveButton {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
         }
     </style>
     <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
@@ -31,14 +50,14 @@
             <!-- Dynamically filled by JavaScript -->
         </tbody>
     </table>
-
+    <hr>
     <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
         <h2>Network Receivers</h2>
         <div class="toolbar">
             <select id="networkSelector">Network</select>
             <button id="addNetReceiverBtn">Add Network Receiver</button>
         </div>
-        
+
     </div>
     <table id="NetWebhookReceiversTable" class="webhook-receivers-table">
         <thead>
@@ -75,7 +94,8 @@
                     <!-- Additional options will be populated here -->
                 </select>
 
-                <input type="submit" value="Save">
+                <!-- Save button positioned at the bottom right of modal-content -->
+                <input type="submit" value="Save" id="saveButton" >
             </form>
         </div>
     </div>

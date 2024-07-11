@@ -8,24 +8,32 @@ class API {
         };
     }
 
-    async fetch(url, options) {
+    async fetch(url, options, retries = 3, delay = 1000) {
         const op = options || {};
         op.headers = { ...this.headers, ...(op.headers || {}) }; // Merge instance headers with request headers
-        try {
-            const response = await fetch(url, {
-                method: op.method || 'GET', // Default to GET if method is not specified
-                headers: op.headers,
-                body: op.body, // Include the request body if present
-            });
+        
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                const response = await fetch(url, {
+                    method: op.method || 'GET', // Default to GET if method is not specified
+                    headers: op.headers,
+                    body: op.body, // Include the request body if present
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    const errorText = await response.json();
+                    throw { status: response.status, message: errorText };
+                }
+
+                return response.json();
+            } catch (error) {
+                console.error(`Attempt ${attempt} failed:`, error);
+                if (attempt < retries) {
+                    await new Promise(resolve => setTimeout(resolve, delay * attempt)); // Exponential backoff
+                } else {
+                    throw error;
+                }
             }
-
-            return response.json();
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            throw error;
         }
     }
 
@@ -61,7 +69,7 @@ class API {
     }
 
     getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, timespanSeconds, queryParams = {}) {
-        console.log("getOrganizationApiRequestsOverviewResponseCodesByInterval", queryParams)
+       // console.log("getOrganizationApiRequestsOverviewResponseCodesByInterval", queryParams)
         let url = `/api/organizations/${organizationId}/apiRequests/overview/responseCodes/byInterval?timespan=${timespanSeconds}`;
         if (queryParams.adminId) {
             url += `&adminIds[]=${queryParams.adminId}`;
@@ -75,7 +83,7 @@ class API {
         if (queryParams.sourceIp) {
             url += `&sourceIps[]=${queryParams.sourceIp}`;
         }
-        console.log("url", url);
+      //  console.log("url", url);
         return this.fetch(url); // Ensure this.fetch is properly implemented to handle the request
     }
 

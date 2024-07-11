@@ -57,7 +57,7 @@ function updateWebhookHistoryByIntervalSuccessFailChart(webhookLogs, timespanSec
         window.webhookRequestsByIntervalLineChart.destroy();
     }
     
-    console.log("updateWebhookHistoryByIntervalSuccessFailChart labels, datasets", labels, datasets)
+   // console.log("updateWebhookHistoryByIntervalSuccessFailChart labels, datasets", labels, datasets)
     window.webhookRequestsByIntervalLineChart = new Chart(ctx, {
         type: 'bar',
         data: {

@@ -57,7 +57,7 @@ function updateWebhookHistoryChart(webhookLogs, timespanSeconds, selectedUrl = n
         window.webhookHistoryChart.destroy();
     }
     
-    console.log("updateWebhookHistoryChart labels, datasets", labels, datasets)
+    // console.log("updateWebhookHistoryChart labels, datasets", labels, datasets)
     window.webhookHistoryChart = new Chart(ctx, {
         type: 'bar',
         data: {
