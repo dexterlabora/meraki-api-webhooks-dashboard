@@ -24,8 +24,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Build app
-      run: npm run build
+    - name: Build app for all platforms
+      run: npm run build-all
 
     - name: Publish artifacts
       uses: actions/upload-artifact@v2

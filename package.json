@@ -51,6 +51,13 @@
       "icon": "./icons/api-logo.icns",
       "identity": null
     },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility",
+      "icon": "./icons"
+    },
     "directories": {
       "output": "build"
     }
