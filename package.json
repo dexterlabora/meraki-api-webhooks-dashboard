@@ -8,12 +8,11 @@
     "start": "electron .",
     "build": "electron-builder",
     "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac --publish 'always' ",
-    "build-mac2":"electron-builder --mac --x64 --arm64 --publish 'onTagOrDraft'",
-    "build-all": "electron-builder -mw --publish 'always' && npm run move-binaries",
-    "move-binaries": "cp build/*.exe dist/ && cp build/*.dmg dist/",
+    "build-mac": "electron-builder --mac --publish 'always'",
+    "build-linux": "electron-builder --linux",
+    "build-linux-windows": "electron-builder -wl --publish 'always'",
+    "move-binaries": "cp build/*.exe dist/ && cp build/*.dmg dist/ && cp build/*.AppImage dist/",
     "publish-github": "electron-builder --publish always"
-
   },
   "keywords": [
     "Cisco",
