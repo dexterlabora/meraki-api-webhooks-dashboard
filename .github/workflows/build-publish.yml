@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ELECTRON_DEPLOY_TOKEN: ${{ secrets.ELECTRON_DEPLOY }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
     - name: Checkout code

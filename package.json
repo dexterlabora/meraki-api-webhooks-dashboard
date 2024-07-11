@@ -63,6 +63,6 @@
     "provider": "github",
     "owner": "dexterlabora",
     "repo": "meraki-api-webhooks-dashboard",
-    "token": "${{ secrets.ELECTRON_DEPLOY }}"
+    "token": "${{ secrets.GH_TOKEN }}"
   }
 }
