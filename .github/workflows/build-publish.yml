@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ELECTRON_DEPLOY_TOKEN: ${{ secrets.ELECTRON_DEPLOY }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
