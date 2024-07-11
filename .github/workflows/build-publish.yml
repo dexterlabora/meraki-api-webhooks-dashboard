@@ -60,7 +60,6 @@ jobs:
         name: binaries
         path: build/*.dmg
 
-  build-linux:
     runs-on: ubuntu-latest
 
     env:
