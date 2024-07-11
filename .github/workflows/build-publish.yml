@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-linux-windows:
+  build-windows:
     runs-on: ubuntu-latest
 
     env:
@@ -24,8 +24,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Build app for Linux and Windows
-      run: npm run build-linux-windows
+    - name: Build app for Windows
+      run: npm run build-windows
 
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
@@ -33,8 +33,6 @@ jobs:
         name: binaries
         path: |
           build/*.exe
-          build/*.AppImage
-          build/*.snap
 
   build-mac:
     runs-on: macos-latest
