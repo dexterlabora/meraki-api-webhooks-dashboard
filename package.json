@@ -42,7 +42,7 @@
     "mac": {
       "target": [
         {
-          "target": "mas",
+          "target": "dmg",
           "arch": [
             "universal"
           ]
@@ -53,7 +53,8 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "snap"
       ],
       "category": "Utility",
       "icon": "./icons"

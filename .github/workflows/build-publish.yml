@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-linux-windows:
     runs-on: ubuntu-latest
 
     env:
@@ -24,8 +24,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Build app for all platforms
-      run: npm run build-all
+    - name: Build app for Linux and Windows
+      run: npm run build-linux-windows
 
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
@@ -33,5 +33,34 @@ jobs:
         name: binaries
         path: |
           build/*.exe
+          build/*.AppImage
+          build/*.snap
+
+  build-mac:
+    runs-on: macos-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build app for macOS
+      run: npm run build-mac
+
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: binaries
+        path: |
           build/*.dmg
           build/*.app
