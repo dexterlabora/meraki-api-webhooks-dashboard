@@ -27,11 +27,26 @@ jobs:
     - name: Build app for Windows
       run: npm run build-win
 
-    - name: Publish artifacts
-      uses: actions/upload-artifact@v2
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        name: binaries
-        path: build/*.exe
+        tag_name: v1.${{ github.run_number }}
+        release_name: Release v1.${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Windows Artifacts
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/*.exe
+        asset_name: meraki-api-webhooks-dashboard.exe
+        asset_content_type: application/octet-stream
 
   build-mac:
     runs-on: macos-latest
@@ -54,8 +69,12 @@ jobs:
     - name: Build app for macOS
       run: npm run build-mac
 
-    - name: Publish artifacts
-      uses: actions/upload-artifact@v2
+    - name: Upload macOS Artifacts
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        name: binaries
-        path: build/*.dmg
+        upload_url: ${{ needs.build-windows.outputs.upload_url }}
+        asset_path: build/*.dmg
+        asset_name: meraki-api-webhooks-dashboard.dmg
+        asset_content_type: application/octet-stream
