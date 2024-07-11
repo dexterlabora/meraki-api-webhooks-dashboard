@@ -1,0 +1,34 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build app
+      run: npm run build
+
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: binaries
+        path: |
+          build/*.exe
+          build/*.dmg
+          build/*.app
