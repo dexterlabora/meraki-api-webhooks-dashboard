@@ -1,4 +1,27 @@
-
+/**
+ * Webhook History Chart Generator
+ * 
+ * This module creates and updates a stacked bar chart visualizing webhook history
+ * categorized by response codes. It uses Chart.js for rendering the chart.
+ * 
+ * Key features:
+ * - Generates a stacked bar chart showing webhook counts by response code over time
+ * - Dynamically adjusts time labels based on the selected timespan
+ * - Supports filtering by specific webhook URLs
+ * - Color-codes response categories for easy visualization
+ * - Responsive design that adjusts to window resizing
+ * 
+ * Main functions:
+ * - updateWebhookHistoryChart: Core function to create/update the chart
+ * - getLabelFormat: Determines appropriate time format based on timespan
+ * - formatLabel: Formats date labels for chart axes
+ * - groupLogsByTime: Processes webhook logs into time-based groups
+ * - createDatasetsForWebhookLogs: Prepares data for Chart.js consumption
+ * - getColorForResponseCode: Assigns colors to different response code categories
+ * 
+ * Note: This module requires Chart.js to be loaded in the global scope.
+ * Ensure Chart.js is properly included in your project before using this module.
+ */
 
 // Check if Chart.js is available
 if (typeof Chart === 'undefined') {

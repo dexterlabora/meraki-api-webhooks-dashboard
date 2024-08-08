@@ -1,3 +1,31 @@
+/**
+ * Webhook Metrics Visualization
+ * 
+ * This module handles the visualization of webhook metrics data.
+ * It creates and updates various UI components to display metrics and analytics
+ * in a user-friendly format.
+ * 
+ * Key features:
+ * - Generates metric cards for various data categories (URLs, Networks, Alert Types, etc.)
+ * - Creates formatted tables with sortable columns
+ * - Applies color coding to success rates for quick visual assessment
+ * - Handles truncation of long text entries for better display
+ * - Integrates with table sorting functionality
+ * 
+ * Main functions:
+ * - displayWebhookMetrics: Core function that orchestrates the creation of all visualization components
+ * - createMetricsCard: Creates detailed metric cards for various data categories
+ * - createFormattedTable: Generates sortable tables with formatted data
+ * 
+ * Helper functions:
+ * - getSuccessRateColorClass: Determines color class based on success rate
+ * - getFailureRateColorClass: Determines color class based on failure count (currently unused)
+ * 
+ * This module works in conjunction with the webhookMetrics.js for data processing
+ * and relies on DOM manipulation for creating and updating UI components.
+ * It also integrates with the tableSorter.js module for table sorting functionality.
+ */
+
 // Visualization functions for webhook metrics
 import getWebhookMetrics from './webhookMetrics.js';
 import { setupTableSortListeners } from './tableSorter.js';

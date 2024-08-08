@@ -1,3 +1,29 @@
+/**
+ * Table Sorting Module
+ * 
+ * This module provides functionality to make HTML tables sortable by clicking on column headers.
+ * It supports sorting of various data types including text, numbers, and custom formats.
+ * 
+ * Key features:
+ * - Adds click listeners to sortable table headers
+ * - Sorts table rows based on column content
+ * - Supports ascending and descending sort orders
+ * - Handles custom data formats (e.g., "Success / Fail" ratios, percentages)
+ * - Skips non-sortable columns
+ * 
+ * Main functions:
+ * - setupTableSortListeners: Initializes sorting functionality for tables within a container
+ * - sortTableByColumn: Sorts a table based on a specific column
+ * - parseColumnData: Parses column data for proper comparison during sorting
+ * 
+ * Usage:
+ * Call setupTableSortListeners(containerSelector) where:
+ * - containerSelector: CSS selector for the container of sortable tables
+ * 
+ * Note: Tables should have the class "sortable-table" and non-sortable headers
+ * should have the class "non-sortable" for this module to work correctly.
+ */
+
 // Setup sorting for tables, skipping non-sortable headers
 export function setupTableSortListeners(containerSelector) {
     const container = document.querySelector(containerSelector);
@@ -60,7 +86,3 @@ function parseColumnData(text, columnIndex, headers) {
         return isNaN(Number(text)) ? text.toLowerCase() : Number(text);
     }
 }
-
-
-
-

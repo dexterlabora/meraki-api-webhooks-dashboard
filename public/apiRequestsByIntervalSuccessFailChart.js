@@ -1,3 +1,27 @@
+/**
+ * API Requests Success/Fail Chart Generator
+ * 
+ * This module creates and updates a bar chart visualizing the success and failure rates of API requests over time.
+ * It processes time-series data of API requests, categorizing them into successful and failed requests.
+ * 
+ * Key features:
+ * - Generates a bar chart using Chart.js
+ * - Dynamically formats time labels based on the timespan
+ * - Color-codes success (green) and failure (red) for easy visualization
+ * - Provides a stacked view of successful and failed requests
+ * - Responsive design that adjusts to window resizing
+ * 
+ * Main functions:
+ * - updateApiRequestsSuccessFailChart: Core function that creates/updates the chart
+ * - getLabelFormat: Determines appropriate time format based on timespan
+ * - formatLabel: Formats date labels for chart axes
+ * - getColorForResponseCode: Assigns colors to different response code categories (unused in current implementation)
+ * - getResponseCodeDescription: Provides human-readable descriptions for response codes (unused in current implementation)
+ * 
+ * This module is designed to provide a clear visual representation of API request success rates,
+ * allowing users to quickly identify trends and potential issues over time.
+ */
+
 // chart
 const ctx = document.getElementById('apiRequestsByIntervalLineChart').getContext('2d');
 let chart, apiDataCache = {}; // needed for dynamic charts, don't remove
@@ -65,12 +89,12 @@ function getResponseCodeDescription(code) {
 }
 
 function updateApiRequestsSuccessFailChart(data, timespanSeconds) {
+    console.log('updateApiRequestsSuccessFailChart', data, timespanSeconds);
     const labelFormat = getLabelFormat(timespanSeconds);
-    const reversedData = [...data].reverse();
 
     // Filter and prepare datasets for success and failure
-    const successData = [], failureData = [];
-    reversedData.forEach(item => {
+    const successData = [], failureData = [], labels = [];
+    data.forEach(item => {
         let successCount = 0, failureCount = 0;
         item.counts.forEach(count => {
             if (/^2/.test(count.code)) {
@@ -79,8 +103,11 @@ function updateApiRequestsSuccessFailChart(data, timespanSeconds) {
                 failureCount += count.count;
             }
         });
-        successData.push(successCount);
-        failureData.push(failureCount);
+        successData.unshift(successCount);
+        failureData.unshift(failureCount);
+        
+        const date = dateFns.parseISO(item.startTs);
+        labels.unshift(formatLabel(date, labelFormat));
     });
 
     const datasets = [
@@ -91,7 +118,6 @@ function updateApiRequestsSuccessFailChart(data, timespanSeconds) {
             fill: false,
             tension: .5,
             data: successData
-            
         },
         {
             label: 'Failure',
@@ -102,11 +128,6 @@ function updateApiRequestsSuccessFailChart(data, timespanSeconds) {
             data: failureData
         }
     ];
-
-    const labels = reversedData.map(item => {
-        const date = dateFns.parseISO(item.startTs);
-        return formatLabel(date, labelFormat);
-    });
 
     if (window.apiRequestsByIntervalSuccessFailChart) {
         window.apiRequestsByIntervalSuccessFailChart.destroy();
@@ -124,16 +145,18 @@ function updateApiRequestsSuccessFailChart(data, timespanSeconds) {
                     scaleLabel: {
                         display: true,
                         labelString: 'Date and Time'
-                    }
+                    },
+                    reverse: true // Ensure the most recent time is on the right
                 },
                 y: {
-                    
                     stacked: false
                 }
             },
             responsive: true,
-            pointRadius: .05,
             maintainAspectRatio: true,
+            devicePixelRatio: window.devicePixelRatio,
+            pointRadius: .05,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: true }
             }

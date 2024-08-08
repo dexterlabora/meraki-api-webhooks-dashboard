@@ -1,3 +1,28 @@
+/**
+ * Meraki OpenAPI Specification Parser
+ * 
+ * This module fetches and parses the Meraki OpenAPI specification from GitHub.
+ * It extracts key information about API operations, including their IDs, descriptions,
+ * deprecation status, and tags.
+ * 
+ * Key features:
+ * - Fetches the latest Meraki OpenAPI specification from GitHub
+ * - Parses the specification to extract operation details
+ * - Provides a structured array of operation information
+ * 
+ * Main function:
+ * - fetchAndParseOpenAPISpec: Asynchronous function that fetches and processes the spec
+ * 
+ * The parsed data includes:
+ * - operationId: Unique identifier for each API operation
+ * - description: Brief description of the operation's purpose
+ * - deprecated: Boolean indicating if the operation is deprecated
+ * - tags: Array of tags associated with the operation
+ * 
+ * Note: This module requires the Axios library for making HTTP requests.
+ * Ensure Axios is properly imported or included in your project.
+ */
+
 // const axios = require('axios');
 console.log("running meraki-openapi-parser")
 async function fetchAndParseOpenAPISpec() {
@@ -29,4 +54,4 @@ async function fetchAndParseOpenAPISpec() {
   }
 }
 
-export default fetchAndParseOpenAPISpec
+export { fetchAndParseOpenAPISpec };

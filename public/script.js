@@ -1,5 +1,31 @@
-// Constants and State
-const MAX_PAGE_LIMIT = 2; // Default max pages to paginate API
+/**
+ * Main JavaScript for Meraki Dashboard
+ * 
+ * This file contains the core functionality for the Meraki Dashboard application.
+ * It handles API interactions, data visualization, and user interface management.
+ * 
+ * Key features:
+ * - API key and organization management
+ * - Fetching and displaying API requests and webhook logs
+ * - Generating and updating charts and visualizations
+ * - Managing tab navigation and content loading
+ * - Handling user interactions and filters
+ * 
+ * Main components:
+ * - init(): Initializes the application
+ * - fetchApiDataAndUpdateVis(): Fetches API data and updates visualizations
+ * - fetchWebhooksDataAndUpdateVis(): Fetches webhook data and updates visualizations
+ * - updateApiRequestTable(): Updates the API requests table
+ * - updateWebhookLogsTable(): Updates the webhook logs table
+ * - Various chart update functions (e.g., updateApiRequestsChart, updateWebhookHistoryChart)
+ * 
+ * The script also includes utility functions for data formatting, error handling,
+ * and DOM manipulation.
+ * 
+ * Note: This script relies on several imported modules for specific functionalities
+ * such as API handling, chart generation, and data export.
+ */
+
 
 import API from './apiHandlers.js';
 import apiRequestsMetricsViz from './apiRequestsMetricsViz.js';
@@ -10,10 +36,12 @@ import updateWebhookHistoryByIntervalSuccessFailChart from './webhookHistoryByIn
 import updateApiRequestsChart from './apiRequestsByIntervalChart.js';
 import updateApiRequestsSuccessFailChart from './apiRequestsByIntervalSuccessFailChart.js';
 import { updateWebhookHistoryByAlertTypeChart } from './webhookHistoryByAlertTypeChart.js';
-import { fetchApiKeys } from './apiKeyMgmt.js';
+//import { fetchApiKeys } from './apiKeyMgmt.js';
+import { initializeApiKeyManagement } from './apiKeyMgmt.js';
 import { setupTableSortListeners } from './tableSorter.js';
-import { init as initWebhookReceivers } from './webhookReceivers.js';
+import { initWebhookReceivers } from './webhookReceivers.js';
 import { init as initWebhookTemplates } from './webhookTemplates.js';
+import { exportToExcel }from './exportToExcel.js';
 
 // configs
 const apiKeyInput = document.getElementById('apiKey');
@@ -22,17 +50,179 @@ const configModal = document.getElementById('configModal');
 const configToggle = document.getElementById('configToggle');
 const closeModal = document.querySelector('.close');
 const loader = document.getElementById('loader');
+const apiKey = localStorage.getItem('MerakiApiKey');
+const api = new API(apiKey);
 
 // Global Variables
 let webhookLogsData = [];
+const API_EXPORT_DATA = {};
+let apiRequestsData = []; 
+const MAX_PAGES_LIMIT = 50;
+const MAX_PAGE_LIMIT = 5; // Default max pages to paginate API
 
+let isLoadingMore = false;
+let currentTimespan = 'day'; // Default to 'day'
+
+// Constants for timespan selector IDs
+const TIMESPAN_SELECTORS = {
+    OVERVIEW: 'overviewTimespanSelect',
+    API_METRICS: 'apiMetricsTimespanSelect',
+    API_ANALYSIS: 'apiAnalysisTimespanSelect',
+    WEBHOOKS: 'webhooksTimespanSelect'
+};
+
+
+function createToolbar(metrics, sectionId) {
+    const startTime = new Date(metrics.meta.startTime).toLocaleString();
+    const endTime = new Date(metrics.meta.endTime).toLocaleString();
+    const totalRecords = metrics.meta.numberOfRequests;
+    const timespanSelectId = `${sectionId}TimespanSelect`;
+
+    return `
+      <div class="metrics-toolbar">
+        <div class="toolbar-left">
+          <div class="timespan-selector">
+          from
+            <select id="${timespanSelectId}">
+              <option value="twoHours" ${currentTimespan === 'twoHours' ? 'selected' : ''}>Last 2 Hours</option>
+              <option value="day" ${currentTimespan === 'day' ? 'selected' : ''}>Last Day</option>
+              <option value="week" ${currentTimespan === 'week' ? 'selected' : ''}>Last Week</option>
+              <option value="month" ${currentTimespan === 'month' ? 'selected' : ''}>Last Month</option>
+            </select>
+            <span class="data-summary-value">${startTime} <br>to<br> ${endTime}</span>
+            
+          </div>
+          <button id="refreshButton" class="toolbar-button">Refresh</button>
+           
+        </div>
+        <div class="toolbar-center">
+          <div class="data-summary">
+            <div class="data-summary-item">
+              <span class="data-summary-label">Total Records:</span>
+              <span class="data-summary-value" id="totalApiRecords">${totalRecords}</span>
+            </div>
+            <div class="data-summary-item">
+              
+              <div class="load-more">
+              <button id="loadMoreRecordsBtn" class="toolbar-button">Load</button>
+                <input type="number" id="recordsToLoad" min="1" max="20" value="1" step="1">
+                <span>thousand more records</span>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar-right">
+
+         <button id="exportCSVButton" class="toolbar-button">Export to Excel</button>
+        </div>
+      </div>
+    `;
+}
+
+// Define update functions for each section
+async function updateOverviewData(organizationId, timespanSeconds) {
+    updateWebhooksData(organizationId, timespanSeconds);
+    try {
+        const [apiRequestsOverviewData, responseCodesData] = await Promise.all([
+            api.getOrganizationApiRequestsOverview(organizationId, timespanSeconds),
+            api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, {timespan: timespanSeconds}),
+        ]);
+        updateApiRequestHero(apiRequestsOverviewData.data);
+        updateApiRequestsChart(responseCodesData.data, timespanSeconds);
+        updateApiRequestsSuccessFailChart(responseCodesData.data, timespanSeconds);
+    } catch (error) {
+        console.error("Error updating overview data:", error);
+        displayNotification(`Error updating overview data: ${error.message}`);
+    }
+}
+
+async function updateApiMetricsData(organizationId, timespanSeconds) {
+    try {
+        const responseCodesData = await api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, {timespan: timespanSeconds});
+        updateApiRequestsChart(responseCodesData.data, timespanSeconds);
+     //   updateApiRequestsSuccessFailChart(responseCodesData.data, timespanSeconds);
+    } catch (error) {
+        console.error("Error updating API metrics data:", error);
+        displayNotification(`Error updating API metrics data: ${error.message}`);
+    }
+}
+
+async function updateApiAnalysisData(organizationId, timespanSeconds) {
+    showLoader();
+    try {
+        const apiRequestsParams = {
+            timespan: timespanSeconds,
+            perPage: 1000,
+            maxPages: MAX_PAGE_LIMIT
+        };
+        apiRequestsData = await api.getOrganizationApiRequests(organizationId, apiRequestsParams);
+        updateApiRequestTable(apiRequestsData);
+        const apiRequestMetricsData = await apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins') || '[]'));
+        apiRequestsMetricsViz(apiRequestMetricsData);
+        setupToolbarListeners(organizationId, 'apiAnalysis');
+        populateAllApiRequestsChartFilters(apiRequestMetricsData);
+
+        // Update the total records count
+        const totalRecordsSpan = document.getElementById('totalApiRecords');
+        if (totalRecordsSpan) {
+            totalRecordsSpan.textContent = apiRequestsData.length;
+        }
+
+        API_EXPORT_DATA["apiRequestMetricsData"] = apiRequestMetricsData;
+    } catch (error) {
+        console.error("Error updating API analysis data:", error);
+        displayNotification(`Error updating API analysis data: ${error.message}`);
+    } finally {
+        hideLoader();
+    }
+}
+
+async function updateWebhooksData(organizationId, timespanSeconds) {
+    try {
+        webhookLogsData = await api.getOrganizationWebhooksLogs(organizationId, timespanSeconds, 1000, MAX_PAGE_LIMIT);
+        updateWebhookHero(webhookLogsData);
+        updateWebhookHistoryChart(webhookLogsData, timespanSeconds);
+        updateWebhookHistoryByIntervalSuccessFailChart(webhookLogsData, timespanSeconds);
+        updateWebhookHistoryByAlertTypeChart(webhookLogsData, timespanSeconds);
+        webhookMetricsViz(webhookLogsData);
+        updateWebhookLogsTable(webhookLogsData);
+        const httpServerStats = calculateHttpServerStats(webhookLogsData);
+        updateHttpServerStats(httpServerStats);
+        populateWebhookUrlSelector(webhookLogsData);
+    } catch (error) {
+        console.error("Error updating webhooks data:", error);
+        displayNotification(`Error updating webhooks data: ${error.message}`);
+    }
+}
+
+// Define updateSectionData in the global scope
+function updateSectionData(selectorId, timespanSeconds) {
+    const organizationId = localStorage.getItem('MerakiOrganizationId');
+    updateDateLabels(timespanSeconds, `${selectorId}StartDate`, `${selectorId}EndDate`);
+
+    switch (selectorId) {
+        case TIMESPAN_SELECTORS.OVERVIEW:
+            updateOverviewData(organizationId, timespanSeconds);
+            break;
+        case TIMESPAN_SELECTORS.API_METRICS:
+            updateApiMetricsData(organizationId, timespanSeconds);
+            break;
+        case TIMESPAN_SELECTORS.API_ANALYSIS:
+            updateApiAnalysisData(organizationId, timespanSeconds);
+            break;
+        case TIMESPAN_SELECTORS.WEBHOOKS:
+            updateWebhooksData(organizationId, timespanSeconds);
+            break;
+    }
+}
 
 // Load stored API key and Org ID
 function loadStoredConfig() {
     if (localStorage.getItem('MerakiApiKey')) {
         apiKeyInput.value = localStorage.getItem('MerakiApiKey');
 
-        fetchOrganizations();
+
 
     }
     if (localStorage.getItem('MerakiOrganizationId')) {
@@ -44,24 +234,25 @@ function loadStoredConfig() {
 function handleConfigFormSubmit(event) {
     event.preventDefault();
     const apiKey = apiKeyInput.value;
+    if (apiKey === '') {
+        localStorage.removeItem('MerakiApiKey');
+        api.setApiKey(''); // Clear the API key in the API instance
+        displayNotification("API Key cleared. You have been logged out.");
+        return;
+    }
     if (!apiKey) {
         displayNotification("API Key is required!");
         return;
     }
     localStorage.setItem('MerakiApiKey', apiKey);
-    fetchOrganizations();
+    api.setApiKey(apiKey); // Update the API instance with the new key
+    fetchOrganizations(); // Fetch organizations with the new API key
     configModal.style.display = 'none';
 }
 
 // Initialize the application
 function init() {
     console.log("Loading Dashboard");
-    // Initial display setup for default active tab content
-    const defaultContent = document.getElementById('overviewTabSection');
-    if (defaultContent) {
-        defaultContent.style.display = 'block'; // Ensure the default tab content is visible
-    }
-
     initializeEventListeners();
     setActiveTab('overviewTab');
     loadStoredConfig();
@@ -70,29 +261,53 @@ function init() {
     const filterInputs = document.querySelectorAll('.scrollable-table thead input[type="text"]');
     filterInputs.forEach(input => filterTable(input, input.dataset.columnIndex));
 
-    // Setup initial timespan dates and fetch initial data
+    // Setup initial timespan dates
     setupInitialTimespanDates();
 
-    // Fetch initial data for API and Webhooks
-    fetchInitialData();
-
+    // Check if API key exists and load organizations
+    const apiKey = localStorage.getItem('MerakiApiKey');
+    if (apiKey && apiKey !== '') {
+        fetchOrganizations();
+    } else {
+        // Open credentials config form if API key is not set or empty
+        configModal.style.display = 'block';
+    }
 }
-// Fetch initial data for API and Webhooks
-function fetchInitialData() {
-    const initialApiTimespanSeconds = getTimespanInSeconds(document.getElementById('apiRequestsTimespanSelect').value);
-    const initialWebhookTimespanSeconds = getTimespanInSeconds(document.getElementById('webhooksTimespanSelect').value);
 
-    fetchApiDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), initialApiTimespanSeconds);
-    fetchWebhooksDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), initialWebhookTimespanSeconds);
+// Fetch initial data for API and Webhooks
+async function fetchInitialData() {
+    const organizationId = localStorage.getItem('MerakiOrganizationId');
+    if (!organizationId) {
+        console.error("No organization selected.");
+        return;
+    }
+
+    await fetchOrganizationAdmins(organizationId);
+    await fetchOrganizationNetworks(organizationId);
+
+    // Fetch initial data for each section
+    Object.values(TIMESPAN_SELECTORS).forEach(selectorId => {
+        const selector = document.getElementById(selectorId);
+        if (selector) {
+            const timespanSeconds = getTimespanInSeconds(selector.value);
+            updateSectionData(selectorId, timespanSeconds);
+        } else {
+            console.warn(`Timespan selector with ID ${selectorId} not found.`);
+        }
+    });
 }
 
 // Set initial timespan dates for API requests and webhook logs
 function setupInitialTimespanDates() {
-    const apiTimespanSeconds = getTimespanInSeconds(document.getElementById('apiRequestsTimespanSelect').value);
-    const webhookTimespanSeconds = getTimespanInSeconds(document.getElementById('webhooksTimespanSelect').value);
-
-    updateDateLabels(apiTimespanSeconds, 'apiRequestsStartDate', 'apiRequestsEndDate');
-    updateDateLabels(webhookTimespanSeconds, 'webhooksStartDate', 'webhooksEndDate');
+    Object.values(TIMESPAN_SELECTORS).forEach(selectorId => {
+        const selector = document.getElementById(selectorId);
+        if (selector) {
+            const timespanSeconds = getTimespanInSeconds(selector.value);
+            updateDateLabels(timespanSeconds, `${selectorId}StartDate`, `${selectorId}EndDate`);
+        } else {
+            console.warn(`Timespan selector with ID ${selectorId} not found.`);
+        }
+    });
 }
 
 // Calculates the start and end dates for a given timespan in seconds
@@ -108,8 +323,20 @@ function updateDateLabels(timespanSeconds, startId, endId) {
     const { startDate, endDate } = calculateTimespanDates(timespanSeconds);
     const formatOptions = getFormatOptions(timespanSeconds);
 
-    document.getElementById(startId).textContent = new Intl.DateTimeFormat('en-US', formatOptions).format(startDate);
-    document.getElementById(endId).textContent = new Intl.DateTimeFormat('en-US', formatOptions).format(endDate);
+    const startElement = document.getElementById(startId);
+    const endElement = document.getElementById(endId);
+
+    if (startElement) {
+        startElement.textContent = new Intl.DateTimeFormat('en-US', formatOptions).format(startDate);
+    } else {
+        console.warn(`Start date element with ID ${startId} not found.`);
+    }
+
+    if (endElement) {
+        endElement.textContent = new Intl.DateTimeFormat('en-US', formatOptions).format(endDate);
+    } else {
+        console.warn(`End date element with ID ${endId} not found.`);
+    }
 }
 
 // Determine the format options based on the timespan
@@ -124,13 +351,10 @@ function getFormatOptions(timespanSeconds) {
 
 // Event Listeners
 function initializeEventListeners() {
+
     configToggle.onclick = () => configModal.style.display = 'block';
     closeModal.onclick = () => configModal.style.display = 'none';
     window.onclick = (event) => {
-
-        if (event.target === configModal) {
-            configModal.style.display = 'none';
-        }
         if (event.target === configModal) {
             configModal.style.display = 'none';
         }
@@ -138,6 +362,7 @@ function initializeEventListeners() {
 
     document.getElementById('configForm').onsubmit = handleConfigFormSubmit;
 
+    // Modify the organization select change handler
     organizationSelect.onchange = async function () {
         const organizationId = this.value;
         if (!organizationId) {
@@ -147,27 +372,26 @@ function initializeEventListeners() {
         localStorage.setItem('MerakiOrganizationId', organizationId);
         await fetchOrganizationAdmins(organizationId);
         await fetchOrganizationNetworks(organizationId);
-        updateVisualizationsForOrganization(organizationId);
+
+        // Ensure the DOM is fully loaded before updating visualizations
+        if (document.readyState === 'complete') {
+            updateVisualizationsForOrganization(organizationId);
+        } else {
+            window.addEventListener('load', () => updateVisualizationsForOrganization(organizationId));
+        }
     };
 
-    // Event listener for global timespan selector
-    document.getElementById('globalTimespanSelect').addEventListener('change', () => {
-        const timespanSeconds = getTimespanInSeconds(globalTimespanSelect.value);
-        fetchApiDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
-        fetchWebhooksDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
-    });
-
-    document.getElementById('apiRequestsTimespanSelect').addEventListener('change', function () {
-        const timespanSeconds = getTimespanInSeconds(this.value);
-        updateDateLabels(timespanSeconds, 'apiRequestsStartDate', 'apiRequestsEndDate');
-        fetchApiDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
-
-    });
-
-    document.getElementById('webhooksTimespanSelect').addEventListener('change', function () {
-        const timespanSeconds = getTimespanInSeconds(this.value);
-        updateDateLabels(timespanSeconds, 'webhooksStartDate', 'webhooksEndDate');
-        fetchWebhooksDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), localStorage.getItem('MerakiOrganizationId'), timespanSeconds);
+    // Add event listeners for each timespan selector
+    Object.values(TIMESPAN_SELECTORS).forEach(selectorId => {
+        const selector = document.getElementById(selectorId);
+        if (selector) {
+            selector.addEventListener('change', function () {
+                const timespanSeconds = getTimespanInSeconds(this.value);
+                updateSectionData(selectorId, timespanSeconds);
+            });
+        } else {
+            console.warn(`Timespan selector with ID ${selectorId} not found.`);
+        }
     });
 
     document.getElementById('urlSelect').addEventListener('change', updateChartsForSelectedUrl);
@@ -202,6 +426,7 @@ function initializeEventListeners() {
         setActiveTab('apiMetricsTab');
     });
 
+  
 
     initializeFilterEventListeners();
     initializeWebhookChartSelectors();
@@ -210,7 +435,7 @@ function initializeEventListeners() {
 
 // Tabs
 function setActiveTab(tabId) {
-    console.log("setActiveTab: ", tabId);
+    // console.log("setActiveTab: ", tabId);
     const isSubTab = document.getElementById(tabId).classList.contains('sub-tab');
     const topLevelTabs = document.querySelectorAll('.tabs > .tab');
     const subLevelTabs = document.querySelectorAll('.sub-tabs > .tab');
@@ -284,10 +509,9 @@ function fetchAndDisplayApiKeyMgmtPage(content) {
         .then(response => response.text())
         .then(html => {
             content.innerHTML = html;
-            const api = new API(localStorage.getItem('MerakiApiKey'));
-            fetchApiKeys(api);
+           // fetchApiKeys(api);
+           initializeApiKeyManagement(api);
             displayUserDetails(api);
-            // Optionally, re-initialize any JavaScript that needs to run in the loaded content
         })
         .catch(error => console.error('Failed to load API Keys content:', error));
 }
@@ -297,7 +521,6 @@ function fetchAndDisplayWebhookReceiversPage(content) {
         .then(response => response.text())
         .then(html => {
             content.innerHTML = html;
-            const api = new API(localStorage.getItem('MerakiApiKey'));
             console.log('fetchAndDisplayWebhookReceiversPage')
             initWebhookReceivers(api);
         });
@@ -333,7 +556,8 @@ function updateChartsForSelectedUrl() {
 }
 
 // Function to dynamically populate URL selector from logs
-function populateUrlSelector(logs) {
+function populateWebhookUrlSelector(logs) {
+    console.log("populateUrlSelector logs", logs);
     const urlSet = new Set(logs.map(log => log.url));
     const select = document.getElementById('urlSelect');
     select.innerHTML = '<option value="">All URLs</option>';
@@ -346,8 +570,18 @@ function populateUrlSelector(logs) {
 }
 
 function updateVisualizationsForOrganization(organizationId) {
-    const timespanSeconds = getTimespanInSeconds(document.getElementById('apiRequestsTimespanSelect').value);
-    updateDateLabels(timespanSeconds, 'apiRequestsStartDate', 'apiRequestsEndDate');
+
+    const timespanSelect = document.getElementById('apiRequestsTimespanSelect');
+    let timespanSeconds;
+
+    if (timespanSelect) {
+        timespanSeconds = getTimespanInSeconds(timespanSelect.value);
+        updateDateLabels(timespanSeconds, 'apiRequestsStartDate', 'apiRequestsEndDate');
+    } else {
+        console.warn('apiRequestsTimespanSelect not found, using default timespan');
+        timespanSeconds = getTimespanInSeconds('day'); // Use a default value
+    }
+
     fetchApiDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), organizationId, timespanSeconds);
     fetchWebhooksDataAndUpdateVis(localStorage.getItem('MerakiApiKey'), organizationId, timespanSeconds);
 }
@@ -384,25 +618,26 @@ window.filterTable = filterTable;
 
 
 
-// ****************************
 // Gather Data
-// ****************************
+
 
 // Fetches and displays the organizations in a select dropdown
 async function fetchOrganizations() {
     console.log("Fetching Organizations");
-    const apiKey = apiKeyInput.value;
+    const apiKey = localStorage.getItem('MerakiApiKey');
     if (!apiKey) {
         console.error("API Key must be set.");
         displayNotification('API Key is required.');
+        configModal.style.display = 'block';
         return;
     }
-    const api = new API(apiKey);
+
     try {
         showLoader();
-        const data = await api.getOrganizations();
-        console.log("organizations", data)
+        const { data } = await api.getOrganizations();
+        console.log("organizations", data);
         organizationSelect.innerHTML = '<option value="">Select Organization</option>';
+        data.sort((a, b) => a.name.localeCompare(b.name)); // Sort organizations alphabetically
         data.forEach(org => {
             const option = document.createElement('option');
             option.value = org.id;
@@ -410,37 +645,42 @@ async function fetchOrganizations() {
             organizationSelect.appendChild(option);
         });
 
-
         // Check if the stored organization ID is in the options list, otherwise select the 1st option
         const storedOrganizationId = localStorage.getItem('MerakiOrganizationId');
         const organizationIds = Array.from(organizationSelect.options).map(option => option.value);
 
         if (organizationIds.includes(storedOrganizationId)) {
             organizationSelect.value = storedOrganizationId;
-        } else if (organizationSelect.options.length > 0) {
-            organizationSelect.value = organizationSelect.options[0].value;
+        } else if (organizationSelect.options.length > 1) {
+            organizationSelect.value = organizationSelect.options[1].value; // Select first org (index 1 because index 0 is the placeholder)
+            localStorage.setItem('MerakiOrganizationId', organizationSelect.value);
         }
+
         hideLoader();
+        
+        // Only fetch initial data if an organization is selected
+        if (organizationSelect.value) {
+            fetchInitialData();
+        }
     } catch (error) {
         console.error('Error fetching organizations:', error);
         displayNotification('Failed to fetch organizations. Check console for details.');
         hideLoader();
+        configModal.style.display = 'block';
     }
 }
 
 // Fetches and stores admin data for the selected organization
 async function fetchOrganizationAdmins(organizationId) {
-
     console.log("fetching admins for ", organizationId);
     const apiKey = localStorage.getItem('MerakiApiKey');
     if (!apiKey || !organizationId) {
         console.error("API Key and Organization ID must be set.");
         return;
     }
-    const api = new API(apiKey);
 
     try {
-        const admins = await api.getOrganizationAdmins(organizationId);
+        const { data: admins } = await api.getOrganizationAdmins(organizationId);
         // Save the admins data for later use in visualizations
         localStorage.setItem('MerakiAdmins', JSON.stringify(admins));
         console.log('Admins fetched and stored:', admins);
@@ -459,10 +699,12 @@ async function fetchOrganizationNetworks(organizationId) {
         console.error("API Key and Organization ID must be set.");
         return;
     }
-    const api = new API(apiKey);
 
     try {
-        const networks = await api.getOrganizationNetworks(organizationId);
+        const networks = await api.getOrganizationNetworks(organizationId).then(res => {
+            console.log('Networks fetched and stored:', res.data);
+            return res.data;
+        });
         // Save the networks data for later use
         localStorage.setItem('networks', JSON.stringify(networks));
         console.log('Networks fetched and stored:', networks);
@@ -472,56 +714,186 @@ async function fetchOrganizationNetworks(organizationId) {
     }
 }
 
-// Main function to load API Request and Response Code data
-async function fetchApiDataAndUpdateVis(apiKey, organizationId, timespanSeconds) {
-    console.log("fetchApiDataAndUpdateVis timespanSeconds", timespanSeconds);
+async function loadMoreApiRequests() {
+    if (isLoadingMore) return; // Prevent multiple executions
+    isLoadingMore = true;
+
+    const loadMoreButton = document.getElementById('loadMoreRecordsBtn');
+    const recordsToLoadInput = document.getElementById('recordsToLoad');
+
+    if (!loadMoreButton || !recordsToLoadInput) {
+        console.error('Required elements not found');
+        isLoadingMore = false;
+        return;
+    }
+
+    loadMoreButton.disabled = true;
+    //loadMoreButton.textContent = 'Loading...';
+    loadMoreButton.querySelector('i').className = 'fa fa-spinner fa-spin';
+
     showLoader();
-    const api = new API(apiKey);
+
+    const organizationId = localStorage.getItem('MerakiOrganizationId');
+    const timespanSeconds = getTimespanInSeconds(currentTimespan);
+    const recordsToLoad = parseInt(recordsToLoadInput.value, 10) || 1;
+    const pagesToLoad = Math.min(recordsToLoad, MAX_PAGES_LIMIT);
 
     try {
-        const [apiRequestsOverviewData, responseCodesData, apiRequestsData] = await Promise.all([
+        const params = {
+            timespan: timespanSeconds,
+            perPage: 1000,
+            maxPages: pagesToLoad,
+            endingBefore: apiRequestsData.length > 0 ? new Date(apiRequestsData[apiRequestsData.length - 1].ts).getTime() / 1000 : undefined
+        };
+
+        const newRecords = await api.getOrganizationApiRequests(organizationId, params);
+
+        apiRequestsData = [...apiRequestsData, ...newRecords].sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
+        updateApiRequestTable(apiRequestsData);
+        const apiRequestMetricsData = await apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins')));
+        apiRequestsMetricsViz(apiRequestMetricsData);
+        populateAllApiRequestsChartFilters(apiRequestMetricsData);
+
+        loadMoreButton.disabled = newRecords.length < pagesToLoad * 1000;
+        loadMoreButton.querySelector('i').className = 'fa fa-plus';
+
+        // Update total records count
+        const totalRecordsSpan = document.getElementById('totalApiRecords');
+        if (totalRecordsSpan) {
+            totalRecordsSpan.textContent = apiRequestsData.length;
+        }
+    } catch (error) {
+        console.error("Error loading more API requests:", error);
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Load more records';
+    } finally {
+        hideLoader();
+        isLoadingMore = false;
+    }
+}
+
+
+function setupToolbarListeners(organizationId, sectionId) {
+    const toolbarContainer = document.querySelector('.toolbar');
+    if (!toolbarContainer) {
+        console.error('Toolbar not found');
+        return;
+    }
+
+    const timespanSelect = document.getElementById(`${sectionId}TimespanSelect`);
+    timespanSelect.addEventListener('change', async (event) => {
+        currentTimespan = event.target.value; // Update the current timespan
+        const timespanSeconds = getTimespanInSeconds(currentTimespan);
+        await updateSectionData(sectionId, timespanSeconds);
+    });
+
+    toolbarContainer.addEventListener('click', async (event) => {
+        const timespanSeconds = getTimespanInSeconds(timespanSelect.value);
+        const clickedElement = event.target.closest('button');
+
+        if (!clickedElement) return;
+
+        if (clickedElement.id === 'refreshButton') {
+            await updateSectionData(sectionId, timespanSeconds);
+        } else if (clickedElement.id === 'loadMoreRecordsBtn') {
+            await loadMoreApiRequests();
+        } else if (clickedElement.id === 'exportCSVButton') {
+            exportToCSV(sectionId === 'apiMetrics');
+        }
+    });
+
+    const recordsToLoadInput = document.getElementById('recordsToLoad');
+    if (recordsToLoadInput) {
+        recordsToLoadInput.addEventListener('change', (event) => {
+            const newCount = parseInt(event.target.value, 10);
+            console.log(`Records to load changed to ${newCount}`);
+        });
+    }
+}
+
+function exportToCSV(isApiMetrics) {
+    try {
+        const organizationName = organizationSelect.options[organizationSelect.selectedIndex].textContent.split('(')[0].trim();
+        const timespanSelect = document.getElementById(isApiMetrics ? 'apiMetricsTimespanSelect' : 'apiAnalysisTimespanSelect');
+       // const dataKey = isApiMetrics ? "apiRequestMetricsData" : "apiAnalysisData";
+        const title = isApiMetrics ? "API-metrics" : "API-analysis";
+
+        const timeHuman = getCurrentDateAndTimespan(timespanSelect.value);
+        const fullTitle = `${title}-${organizationName}-${timeHuman}`;
+
+        exportToExcel(fullTitle, API_EXPORT_DATA["apiRequestMetricsData"]);
+    } catch (error) {
+        console.error('Error exporting to Excel:', error);
+        displayNotification('Failed to export data to CSV.');
+    }
+}
+
+
+async function fetchApiDataAndUpdateVis(apiKey, organizationId, timespanSeconds) {
+    showLoader();
+
+    try {
+        const apiRequestsParams = {
+            timespan: timespanSeconds,
+            perPage: 1000,
+            maxPages: MAX_PAGE_LIMIT
+        };
+        console.log("Fetching API requests with params:", apiRequestsParams);
+        apiRequestsData = await api.getOrganizationApiRequests(organizationId, apiRequestsParams);
+        console.log("Received API requests data:", apiRequestsData.length, "items");
+
+        const [apiRequestsOverviewData, responseCodesData] = await Promise.all([
             api.getOrganizationApiRequestsOverview(organizationId, timespanSeconds),
-            api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, timespanSeconds),
-            api.getOrganizationApiRequests(organizationId, timespanSeconds, 1000).fetchAllPages(MAX_PAGE_LIMIT)
+            api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, {timespan: timespanSeconds}),
         ]);
 
         console.log("apiRequestsOverviewData", apiRequestsOverviewData);
         console.log("responseCodesData", responseCodesData);
         console.log("apiRequestsData", apiRequestsData);
 
-        updateApiRequestHero(apiRequestsOverviewData);
-        updateApiRequestsChart(responseCodesData, timespanSeconds);
-        updateApiRequestsSuccessFailChart(responseCodesData, timespanSeconds);
+        updateApiRequestHero(apiRequestsOverviewData.data);
+        updateApiRequestsChart(responseCodesData.data, timespanSeconds);
+        updateApiRequestsSuccessFailChart(responseCodesData.data, timespanSeconds);
         updateApiRequestTable(apiRequestsData);
-        const apiRequestMetricsData = await apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins')));
+        const apiRequestMetricsData = await apiRequestsMetrics(apiRequestsData, JSON.parse(localStorage.getItem('MerakiAdmins') || '[]'));
         console.log("apiRequestMetricsData", apiRequestMetricsData);
 
-        apiRequestsMetricsViz(apiRequestMetricsData);
-        populateAllApiRequestsChartFilters(apiRequestMetricsData);
-        setupTableSortListeners("#apiRequestTable");
+        // Create and insert toolbar
+        const toolbarContainer = document.getElementById('apiToolbar');
+        if (toolbarContainer) {
+            toolbarContainer.innerHTML = createToolbar(apiRequestMetricsData, 'apiMetrics');
+            setupToolbarListeners(organizationId, 'apiMetrics');
+        } else {
+            console.error('API Toolbar container not found');
+        }
 
+        // Display metrics
+        apiRequestsMetricsViz(apiRequestMetricsData);
         console.log("API Requests Data and Visualizations Updated");
+        API_EXPORT_DATA["apiRequestMetricsData"] = apiRequestMetricsData;
+        console.log("API_EXPORT_DATA", API_EXPORT_DATA)
+        return apiRequestMetricsData;
     } catch (error) {
         console.error("Error fetching API requests data:", error);
-        const errorDetails =  error.message.error || error | 'An unexpected error occurred.';
-        displayNotification(`Error fetching API data: \n Error: ${error.status} \n ${errorDetails}`);
+        displayNotification(`Error fetching API data: ${error.message}`);
     } finally {
         hideLoader();
     }
 }
 
 async function fetchWebhooksDataAndUpdateVis(apiKey, organizationId, timespanSeconds) {
+    console.log("fetchWebhooksDataAndUpdateVis timespanSeconds", timespanSeconds);
     showLoader();
-    const api = new API(apiKey);
     try {
-        webhookLogsData = await api.getOrganizationWebhooksLogs(organizationId, timespanSeconds, 1000).fetchAllPages(5);
+        console.log("Fetching webhook logs with timespan:", timespanSeconds);
+        webhookLogsData = await api.getOrganizationWebhooksLogs(organizationId, timespanSeconds, 1000, MAX_PAGE_LIMIT);
         console.log("webhookLogsData", webhookLogsData);
 
         updateWebhookHero(webhookLogsData);
         updateWebhookHistoryChart(webhookLogsData, timespanSeconds);
         updateWebhookHistoryByIntervalSuccessFailChart(webhookLogsData, timespanSeconds);
         updateWebhookHistoryByAlertTypeChart(webhookLogsData, timespanSeconds);
-        populateUrlSelector(webhookLogsData);
+        populateWebhookUrlSelector(webhookLogsData);
         webhookMetricsViz(webhookLogsData);
         updateWebhookLogsTable(webhookLogsData);
         const httpServerStats = calculateHttpServerStats(webhookLogsData);
@@ -531,8 +903,7 @@ async function fetchWebhooksDataAndUpdateVis(apiKey, organizationId, timespanSec
         console.log("Webhooks Data and Visualizations Updated");
     } catch (error) {
         console.error("Error fetching webhooks data:", error);
-        const errorDetails =  error.message.error || 'An unexpected error occurred.';
-        displayNotification(`Error fetching Webhook data: \n Error: ${error.status} \n ${errorDetails}`);
+        displayNotification(`Error fetching Webhook data: ${error.message}`);
     } finally {
         hideLoader();
     }
@@ -575,19 +946,22 @@ function getSuccessRateColorClass(successRate) {
     }
 }
 
-
-
-
 // // Hero - Number of API Requests & Webhooks Sent
 function formatNumber(number) {
     return new Intl.NumberFormat('en-US').format(number);
 }
 
 function updateApiRequestHero(apiData) {
-    const apiSuccessCount = apiData.responseCodeCounts['200'] || 0;
-    const apiFailCount = Object.keys(apiData.responseCodeCounts)
+    if (!apiData || typeof apiData !== 'object') {
+        console.error('Invalid apiData passed to updateApiRequestHero:', apiData);
+        return;
+    }
+
+    const responseCodeCounts = apiData.responseCodeCounts || {};
+    const apiSuccessCount = responseCodeCounts['200'] || 0;
+    const apiFailCount = Object.keys(responseCodeCounts)
         .filter(code => !code.startsWith('2'))
-        .reduce((sum, code) => sum + (apiData.responseCodeCounts[code] || 0), 0);
+        .reduce((sum, code) => sum + (responseCodeCounts[code] || 0), 0);
     const apiSuccessRate = apiSuccessCount + apiFailCount > 0 ?
         ((apiSuccessCount / (apiSuccessCount + apiFailCount)) * 100).toFixed(2) : 'N/A';
 
@@ -643,7 +1017,6 @@ function updateWebhookHero(webhookData) {
     }
 }
 
-
 // *******************
 // API Request Metrics 
 //
@@ -653,7 +1026,18 @@ function updateWebhookHero(webhookData) {
 
 // ** API Request Table **
 function updateApiRequestTable(data) {
-    const admins = JSON.parse(localStorage.getItem('MerakiAdmins')) || [];
+    if (!Array.isArray(data)) {
+        console.error('Invalid data passed to updateApiRequestTable:', data);
+        return;
+    }
+
+    let admins = [];
+    try {
+        admins = JSON.parse(localStorage.getItem('MerakiAdmins')) || [];
+    } catch (error) {
+        console.error('Error parsing admin data:', error);
+    }
+
     const adminMap = new Map(admins.map(admin => [admin.id, admin]));
     const tbody = document.querySelector('#apiRequestTable tbody');
 
@@ -673,7 +1057,6 @@ function updateApiRequestTable(data) {
         `;
     }).join('');
     updateRecordCount('apiRequestTable');
-    //  setupTableSortListeners("#apiRequestTable");
 }
 // Table row count 
 function updateRecordCount(tableId) {
@@ -691,6 +1074,7 @@ function updateRecordCount(tableId) {
 
 // Populate a generic select element from an array of items
 function populateApiRequestsChartSelect(selectId, items, placeholder = "All", nameProperty = "name", valueProperty = "name") {
+    console.log("populateApiRequestsChartSelect selectId items", selectId, items);
     const select = document.getElementById(selectId);
     // Clear existing options except the placeholder
     for (let i = select.options.length - 1; i > 0; i--) {
@@ -708,50 +1092,51 @@ function populateApiRequestsChartSelect(selectId, items, placeholder = "All", na
 
 // Populate dynamic select elements 
 function populateAllApiRequestsChartFilters(metricsData) {
+    
     populateApiRequestsChartSelect('userAgentSelect', metricsData["User Agents"]);
     populateApiRequestsChartSelect('adminSelect', metricsData["Admins"], "name", "adminDetails");
-    populateApiRequestsChartSelect('operationSelect', metricsData["Operation IDs"]);
+    populateApiRequestsChartSelect('operationSelect', metricsData["Operations"]);
     populateApiRequestsChartSelect('sourceIpSelect', metricsData["Source IPs"]);
 }
 
 // Initialize event listeners for filter dropdowns
 function initializeFilterEventListeners() {
-    document.getElementById('userAgentSelect').addEventListener('change', function () {
-        updateDashboardWithFilters();
-    });
-
-    document.getElementById('adminSelect').addEventListener('change', function () {
-        updateDashboardWithFilters();
-    });
-
-    document.getElementById('operationSelect').addEventListener('change', function () {
-        updateDashboardWithFilters();
-    });
-
-    document.getElementById('sourceIpSelect').addEventListener('change', function () {
-        updateDashboardWithFilters();
+    const filters = ['userAgentSelect', 'adminSelect', 'operationSelect', 'sourceIpSelect', 'apiRequestsTimespanSelect'];
+    
+    filters.forEach(filterId => {
+        const element = document.getElementById(filterId);
+        if (element) {
+            element.addEventListener('change', updateDashboardWithFilters);
+        } else {
+            console.warn(`Element with id '${filterId}' not found.`);
+        }
     });
 }
 
+// Add this new function to update the timespan labels
+function updateTimespanLabels(timespanValue) {
+    const now = new Date();
+    const timespanSeconds = getTimespanInSeconds(timespanValue);
+    const startDate = new Date(now.getTime() - timespanSeconds * 1000);
+
+    document.getElementById('apiRequestsTimespanSelectStartDate').textContent = startDate.toLocaleString();
+    document.getElementById('apiRequestsTimespanSelectEndDate').textContent = now.toLocaleString();
+}
+
+// Modify the updateDashboardWithFilters function
 async function updateDashboardWithFilters() {
-    // Ensure that all elements exist
-    const userAgentSelect = document.getElementById('userAgentSelect');
-    const adminSelect = document.getElementById('adminSelect');
-    const operationSelect = document.getElementById('operationSelect');
-    const sourceIpSelect = document.getElementById('sourceIpSelect');
-    const timespanSelect = document.getElementById('apiRequestsTimespanSelect');
+    const filters = ['userAgentSelect', 'adminSelect', 'operationSelect', 'sourceIpSelect', 'apiRequestsTimespanSelect'];
+    const filterValues = {};
 
-    if (!userAgentSelect || !adminSelect || !operationSelect || !sourceIpSelect) {
-        console.error('One or more filter elements are missing.');
-        return;
-    }
+    filters.forEach(filterId => {
+        const element = document.getElementById(filterId);
+        if (element) {
+            filterValues[filterId] = element.value;
+        }
+    });
 
-    const userAgent = userAgentSelect.value;
-    const adminId = adminSelect.value;
-    const operationId = operationSelect.value;
-    const sourceIp = sourceIpSelect.value;
-    const timespan = timespanSelect.value;
-    const timespanSeconds = getTimespanInSeconds(timespan);
+    const timespanValue = filterValues.apiRequestsTimespanSelect;
+    const timespanSeconds = getTimespanInSeconds(timespanValue);
     const apiKey = localStorage.getItem('MerakiApiKey');
     const organizationId = localStorage.getItem('MerakiOrganizationId');
 
@@ -760,18 +1145,35 @@ async function updateDashboardWithFilters() {
         return;
     }
 
-    const api = new API(apiKey);
+    // Update the timespan labels
+    updateTimespanLabels(timespanValue);
+
     try {
-        console.log("updateDashboardWithFilters timespanSeconds", timespanSeconds)
         showLoader();
-        const responseCodesData = await api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, timespanSeconds, {
-            userAgent,
-            adminId,
-            operationId,
-            sourceIp
-        });
-        updateApiRequestsChart(responseCodesData, timespan);
-        updateApiRequestsSuccessFailChart(responseCodesData, timespanSeconds);
+        const params = {
+            timespan: timespanSeconds,
+            // interval:120,
+            userAgent: filterValues.userAgentSelect !== "All" ? filterValues.userAgentSelect : undefined,
+            adminIds: filterValues.adminSelect !== "All" ? [filterValues.adminSelect] : undefined,
+            operationIds: filterValues.operationSelect !== "All" ? [filterValues.operationSelect] : undefined,
+            sourceIps: filterValues.sourceIpSelect !== "All" ? [filterValues.sourceIpSelect] : undefined
+        };
+
+        // Remove undefined values
+        Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
+
+        console.log("Sending request with params:", params);
+        const responseCodesData = await api.getOrganizationApiRequestsOverviewResponseCodesByInterval(organizationId, params);
+
+        console.log("Received response:", responseCodesData);
+
+        if (responseCodesData && responseCodesData.data) {
+            updateApiRequestsChart(responseCodesData.data, timespanSeconds);
+            updateApiRequestsSuccessFailChart(responseCodesData.data, timespanSeconds);
+        } else {
+            console.error('Unexpected response format:', responseCodesData);
+            displayNotification('Received unexpected data format from the server.');
+        }
     } catch (error) {
         console.error('Error updating chart:', error);
         displayNotification('Failed to update the chart based on the selected filters.');
@@ -779,6 +1181,12 @@ async function updateDashboardWithFilters() {
         hideLoader();
     }
 }
+
+// Make sure to call updateDashboardWithFilters when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // ... other initialization code ...
+    updateDashboardWithFilters();
+});
 
 // ****************
 // Webhooks
@@ -879,6 +1287,18 @@ function displayNotification(message) {
     setTimeout(() => {
         notificationBanner.style.display = 'none';
     }, 5000); // Hide the notification after 5 seconds
+}
+
+function getCurrentDateAndTimespan(timespan) {
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in ISO format
+    const timespanLabels = {
+        'twoHours': '2 Hours',
+        'day': '1 Day',
+        'week': '1 Week',
+        'month': '1 Month'
+    };
+    const selectedTimespan = timespanLabels[timespan] || '1 Month'; // Default to 1 Month if not specified
+    return `${currentDate}_${selectedTimespan}`;
 }
 
 // Start the application

@@ -23,7 +23,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@electron/packager": "18.3.2",
@@ -59,7 +60,13 @@
     },
     "directories": {
       "output": "build"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "node_modules/xlsx",
+        "to": "xlsx"
+      }
+    ]
   },
   "repository": {
     "type": "git",

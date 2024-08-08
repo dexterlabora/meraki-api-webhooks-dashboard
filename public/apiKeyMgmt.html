@@ -1,11 +1,40 @@
+<!--
+API Key Management Interface
+
+This HTML file provides the structure for the API key management interface.
+It allows users to view, generate, and revoke API keys for their account.
+
+Key features:
+- Displays user information (name and email)
+- Shows the current API keys associated with the account
+- Allows generation of new API keys (up to a maximum of 2)
+- Provides functionality to revoke existing API keys
+- Responsive design for various screen sizes
+
+Main components:
+1. Header: Contains user information and API key generation button
+2. API Keys Table: Displays existing API keys with creation time and actions
+3. Notification: Informs users when they've reached the maximum number of API keys
+
+The interface is designed to be embedded within a larger application structure.
+It relies on external JavaScript (apiKeyMgmt.js) for dynamic functionality.
+
+Note: This file should be styled using the application's global CSS to maintain consistency.
+
+-->
+
 <!-- apiKeyMgmt.html -->
 <div class="api-keys-container">
 
  <!-- header -->
   <div class="api-keys-mgmt-header">
-    <h2>Personal</h2> 
+    <h2>Personal API Keys</h2> 
     <div class="userDetails">
-    <label>API Keys for</label> <span id="userName"></span> (<span id="userEmail"></span>)
+    <span id="userName"></span> (<span id="userEmail"></span>)
+     <div id="adminInfo">
+      <!-- admin info will be displayed here -->
+     </div> 
+
   </div>
     <div class="api-keys-info">
       <p>Maximum of 2 keys</p>
@@ -30,7 +59,7 @@
     </tbody>
   </table>
   <div class="notification">
-    You’ve reached your limit of 2 API keys and must revoke one to generate a
+    You've reached your limit of 2 API keys and must revoke one to generate a
     new one.
   </div>
 </div>

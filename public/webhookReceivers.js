@@ -1,6 +1,34 @@
+/**
+ * Webhook Receivers Management Module
+ * 
+ * This module handles the functionality for managing webhook receivers in the Meraki Dashboard application.
+ * It provides features for displaying, adding, and managing webhook receivers at both organization and network levels.
+ * 
+ * Key features:
+ * - Initializes event listeners for UI interactions
+ * - Loads and displays existing webhook receivers for organizations and networks
+ * - Handles adding new webhook receivers
+ * - Manages the modal for adding/editing webhook receivers
+ * - Populates network selector dropdown
+ * - Fetches and displays payload templates
+ * 
+ * Main functions:
+ * - initWebhookReceiversListeners: Sets up event listeners and initializes the module
+ * - loadWebhookReceivers: Fetches and displays organization-level webhook receivers
+ * - loadWebhookReceiversForNetwork: Fetches and displays network-level webhook receivers
+ * - populatePayloadTemplates: Fetches and populates payload template options
+ * 
+ * This module interacts with the API handler (imported from './apiHandlers.js')
+ * to perform API-related operations. It also manipulates the DOM to update
+ * the user interface based on the current state of webhook receivers.
+ * 
+ * Note: Ensure that the API handler is properly configured and the DOM elements
+ * referenced in this module exist in the corresponding HTML file.
+ */
+
 import API from './apiHandlers.js';
 
-function initWebhookReceiversListeners() {
+export function initWebhookReceivers() {
     const document = window.document;
     const api = new API(localStorage.getItem('MerakiApiKey'));
 
@@ -11,8 +39,7 @@ function initWebhookReceiversListeners() {
     const modal = document.getElementById('receiverModal');
     const closeModal = document.querySelector('.close-receiver-modal');
     const form = document.getElementById('receiverForm');
-    const networkSelector = document.querySelector('.toolbar select');
-
+    const networkSelector = document.getElementById('networkSelector');
 
     // Open modal for adding new receiver
     addOrgReceiverBtn.addEventListener('click', () => {
@@ -48,7 +75,7 @@ function initWebhookReceiversListeners() {
         if (scope === 'organization') {
             api.createOrganizationWebhooksHttpServer(localStorage.getItem('MerakiOrganizationId'), newReceiverData)
                 .then(() => {
-                    loadWebhookReceivers(api);
+                    loadWebhookReceivers();
                     modal.style.display = 'none';
                 })
                 .catch(error => console.error('Error adding organization receiver:', error));
@@ -64,8 +91,8 @@ function initWebhookReceiversListeners() {
     });
 
     // Populate Network Selector Dropdown
-    const networks = JSON.parse(localStorage.getItem('networks'));
-    if (networks) {
+    const networks = JSON.parse(localStorage.getItem('networks') || '[]');
+    if (Array.isArray(networks)) {
         networks.forEach(network => {
             const option = document.createElement('option');
             option.value = network.id; // Set the value to the network ID or any unique identifier
@@ -74,11 +101,15 @@ function initWebhookReceiversListeners() {
         });
 
         // Set the default selected network (first network in the list)
-        const defaultNetworkId = networks[0].id;
-        networkSelector.value = defaultNetworkId;
+        if (networks.length > 0) {
+            const defaultNetworkId = networks[0].id;
+            networkSelector.value = defaultNetworkId;
 
-        // Load webhook receivers for the default selected network
-        loadWebhookReceiversForNetwork(api, defaultNetworkId);
+            // Load webhook receivers for the default selected network
+            loadWebhookReceiversForNetwork(api, defaultNetworkId);
+        }
+    } else {
+        console.error('Networks data is not an array:', networks);
     }
 
     // Network Selector Change Event
@@ -91,30 +122,36 @@ function initWebhookReceiversListeners() {
     populatePayloadTemplates(api);
 }
 
-    // Function to populate the payload template options
-    function populatePayloadTemplates(api) {
-        const payloadTemplateSelect = document.getElementById('payloadTemplate');
+// Function to populate the payload template options
+function populatePayloadTemplates(api) {
+    const payloadTemplateSelect = document.getElementById('payloadTemplate');
+    const organizationId = localStorage.getItem('MerakiOrganizationId');
 
-        const organizationId = localStorage.getItem('MerakiOrganizationId')
-        api.getOrganizationWebhooksPayloadTemplates(organizationId) // Replace organizationId with the actual organization ID
-            .then(payloadTemplates => {
+    api.getOrganizationWebhooksPayloadTemplates(organizationId)
+        .then(res => {
+            console.log("populatePayloadTemplates res.data",res.data);
+            try {
+                let payloadTemplates = res.data; 
                 payloadTemplates.forEach(template => {
                     const option = document.createElement('option');
                     option.value = template.id; // Set the value to the template ID or any unique identifier
                     option.textContent = template.name; // Display the template name
                     payloadTemplateSelect.appendChild(option);
                 });
-            })
-            .catch(error => console.error('Error fetching payload templates:', error));
-    }
+            } catch (error) {
+                console.error('Error parsing payload templates:', error);
+            }
+        })
+        .catch(error => console.error('Error fetching payload templates:', error));
+}
 
 // Function to load webhook data
 function loadWebhookReceivers(api) {
-   // console.log("loadWebhookReceivers");
     const document = window.document;
     const organizationId = localStorage.getItem('MerakiOrganizationId');
     api.getOrganizationWebhooksHttpServers(organizationId)
-        .then(webhooksData => {
+        .then(res => {
+            let webhooksData = res.data;
             const table = document.getElementById('OrgWebhookReceiversTable');
             if (table) {
                 const tbody = table.querySelector('tbody');
@@ -135,14 +172,11 @@ function loadWebhookReceivers(api) {
         .catch(error => console.error('Failed to load webhooks:', error));
 }
 
-function loadWebhookReceiversForNetwork(api,networkId) {
-    // Logic to load webhook receivers for the selected network
-    console.log(`Loading webhook receivers for Network ID: ${networkId}`);
-
+function loadWebhookReceiversForNetwork(api, networkId) {
     const document = window.document;
-
     api.getNetworkWebhooksHttpServers(networkId)
-        .then(webhooksData => {
+        .then(res => {
+            let webhooksData = res.data;
             const table = document.getElementById('NetWebhookReceiversTable');
             if (table) {
                 const tbody = table.querySelector('tbody');
@@ -161,10 +195,4 @@ function loadWebhookReceiversForNetwork(api,networkId) {
             }
         })
         .catch(error => console.error('Failed to load webhooks:', error));
-}
-
-export function init(api) {
- 
-        initWebhookReceiversListeners(api);
-
 }

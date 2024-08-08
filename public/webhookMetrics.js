@@ -1,3 +1,35 @@
+/**
+ * Webhook Metrics Processor
+ * 
+ * This module processes webhook log data to generate comprehensive metrics and analytics.
+ * It analyzes various aspects of webhook activity, including URLs, network IDs, alert types,
+ * and temporal patterns.
+ * 
+ * Key features:
+ * - Aggregates and analyzes webhook log data
+ * - Calculates success rates for various metrics
+ * - Identifies busiest hours and days for webhook activity
+ * - Generates metrics for URLs, networks, and alert types
+ * - Provides sorted arrays of metrics for easy consumption by visualization components
+ * 
+ * Main function:
+ * - getWebhookMetrics: Core function that processes webhook data and generates metrics
+ * 
+ * Helper functions:
+ * - convertToSortedArray: Converts metric objects to sorted arrays with calculated success rates
+ * - incrementCount: Utility function to increment success/failure counts in metric objects
+ * 
+ * The processed metrics include:
+ * - URLs: Performance metrics for each webhook URL
+ * - Networks: Metrics grouped by network ID
+ * - Alert Types: Breakdown of webhook activity by alert type
+ * - Busiest Hours: Hourly activity patterns
+ * - Busiest Days: Daily activity patterns
+ * 
+ * This module is designed to provide comprehensive insights into webhook activity,
+ * facilitating easy integration with visualization and reporting components.
+ */
+
 export const getWebhookMetrics = (webhookData) => {
     const metrics = {
         urls: {},

@@ -1,6 +1,10 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { fork } = require('child_process');
+const { ipcMain } = require('electron');
+
+//const exportToExcel = require('./public/exportToExcel');
+
 
 let mainWindow = null;
 let serverProcess = null;
@@ -44,6 +48,9 @@ app.on('ready', async () => {
   try {
     await startServer();
     createWindow();
+
+    // Add the xlsx module to the global object
+    global.xlsx = require(path.join(process.resourcesPath, 'xlsx'));
   } catch (error) {
     console.error('Error starting server:', error);
   }
@@ -73,4 +80,14 @@ app.on('will-quit', (event) => {
     serverProcess.kill();
   }
 });
+
+// ipcMain.handle('export-to-excel', async (event, { title, data }) => {
+//   try {
+//     await exportToExcel(title, data);
+//     return { success: true };
+//   } catch (error) {
+//     console.error('Error exporting to Excel:', error);
+//     return { success: false, error: error.message };
+//   }
+// });
 

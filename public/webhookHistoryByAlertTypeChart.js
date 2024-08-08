@@ -1,3 +1,27 @@
+/**
+ * Webhook History by Alert Type Chart Generator
+ * 
+ * This module creates and updates a stacked bar chart visualizing webhook history
+ * categorized by alert types. It uses Chart.js for rendering the chart.
+ * 
+ * Key features:
+ * - Generates a stacked bar chart showing webhook counts by alert type over time
+ * - Dynamically adjusts time labels based on the selected timespan
+ * - Supports filtering by specific webhook URLs
+ * - Uses Meraki branding colors for common alert types
+ * - Generates dynamic colors for unknown alert types
+ * 
+ * Main functions:
+ * - updateWebhookHistoryByAlertTypeChart: Core function to create/update the chart
+ * - getLabelFormat: Determines appropriate time format based on timespan
+ * - groupDataByAlertType: Processes webhook logs into chart-ready data structure
+ * - getColorForAlertType: Assigns colors to different alert types
+ * - generateDynamicColor: Creates colors for unknown alert types
+ * 
+ * Note: This module requires Chart.js to be loaded in the global scope.
+ * Ensure Chart.js is properly included in your project before using this module.
+ */
+
 // Check if Chart.js is loaded
 if (typeof Chart === 'undefined') {
     throw new Error('Chart.js is not loaded but is required for this chart module!');

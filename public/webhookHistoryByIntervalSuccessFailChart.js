@@ -1,4 +1,26 @@
-
+/**
+ * Webhook History Success/Fail Chart Generator
+ * 
+ * This module creates and updates a bar chart visualizing the success and failure rates
+ * of webhook deliveries over time. It uses Chart.js for rendering the chart.
+ * 
+ * Key features:
+ * - Generates a stacked bar chart showing successful and failed webhook deliveries
+ * - Dynamically adjusts time labels based on the selected timespan
+ * - Supports filtering by specific webhook URLs
+ * - Uses green for successful deliveries and red for failures
+ * - Responsive design that adjusts to window resizing
+ * 
+ * Main functions:
+ * - updateWebhookHistoryByIntervalSuccessFailChart: Core function to create/update the chart
+ * - getLabelFormat: Determines appropriate time format based on timespan
+ * - formatLabel: Formats date labels for chart axes
+ * - groupLogsByTime: Processes webhook logs into time-based groups
+ * - createDatasetsForWebhookLogs: Prepares data for Chart.js consumption
+ * 
+ * Note: This module requires Chart.js to be loaded in the global scope.
+ * Ensure Chart.js is properly included in your project before using this module.
+ */
 
 // Check if Chart.js is available
 if (typeof Chart === 'undefined') {
@@ -79,7 +101,7 @@ function updateWebhookHistoryByIntervalSuccessFailChart(webhookLogs, timespanSec
             },
             responsive: true,
             pointRadius: .05,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: { legend: { display: true } }
         }
     });

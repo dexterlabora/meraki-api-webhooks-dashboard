@@ -1,3 +1,30 @@
+/**
+ * Webhook Templates Management Module
+ * 
+ * This module handles the functionality for managing webhook payload templates
+ * in the Meraki Dashboard application. It provides features for displaying,
+ * adding, and managing webhook templates at the organization level.
+ * 
+ * Key features:
+ * - Initializes event listeners for UI interactions
+ * - Loads and displays existing webhook payload templates
+ * - Handles adding new webhook templates
+ * - Provides interface for editing and deleting existing templates
+ * 
+ * Main functions:
+ * - initWebhookTemplatesListeners: Sets up event listeners and initializes the module
+ * - loadWebhookTemplates: Fetches and displays organization-level webhook templates
+ * 
+ * This module interacts with the API handler (imported from './apiHandlers.js')
+ * to perform API-related operations. It also manipulates the DOM to update
+ * the user interface based on the current state of webhook templates.
+ * 
+ * Note: Ensure that the API handler is properly configured and the DOM elements
+ * referenced in this module exist in the corresponding HTML file.
+ * 
+ * TODO: Implement edit and delete functionality for existing templates
+ */
+
 import API from './apiHandlers.js';
 
 function initWebhookTemplatesListeners() {
@@ -25,7 +52,8 @@ function loadWebhookTemplates(api) {
     console.log("loadWebhookTemplates");
     const organizationId = localStorage.getItem('MerakiOrganizationId');
     api.getOrganizationWebhooksPayloadTemplates(organizationId)
-        .then(templatesData => {
+        .then(res => {
+            let templatesData = res.data;
             const table = document.getElementById('webhookTemplatesTable');
             if (table) {
                 const tbody = table.querySelector('tbody');
