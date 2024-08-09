@@ -25,7 +25,7 @@
 
 import { setupTableSortListeners } from './tableSorter.js';
 import { createApplicationsBarChart } from './apiRequestsMetricsApplicationsBarChart.js';
-
+import { updateDashboardWithFilters } from './script.js';
 // *******************
 // API Request Metrics 
 // *******************
@@ -61,6 +61,34 @@ function getFailureRateColorClass(failureCount) {
         return '';  // No failures
     }
 }
+
+function getTimespanInSeconds(timespan) {
+    const timespanInSeconds = {
+        'twoHours': 7200,   // 2 hours
+        'day': 86400, // 24 hours
+        'week': 604800, // 7 days
+        'month': 2592000 // 30 days
+    };
+    return timespanInSeconds[timespan] || timespanInSeconds['month']; // Default to 30 days if not specified
+}
+
+function updateTimespanLabels(timespanValue) {
+    const now = new Date();
+    const timespanSeconds = getTimespanInSeconds(timespanValue);
+    const startDate = new Date(now.getTime() - timespanSeconds * 1000);
+
+    document.getElementById('apiResponseCodeTimespanSelectStartDate').textContent = startDate.toLocaleString();
+    document.getElementById('apiResponseCodeTimespanSelectEndDate').textContent = now.toLocaleString();
+}
+
+function showLoader() {
+    loader.style.display = 'block';
+}
+
+function hideLoader() {
+    loader.style.display = 'none';
+}
+
 
 // ******************
 // ** Summary Analysis Card ** 
@@ -401,6 +429,45 @@ function renderUserAgentPieChart(title, data) {
     });
 }
 
+function populateApiRequestsChartSelect(selectId, items, placeholder = "All", nameProperty = "name", valueProperty = "name") {
+    console.log("populateApiRequestsChartSelect selectId items", selectId, items);
+    const select = document.getElementById(selectId);
+    // Clear existing options except the placeholder
+    for (let i = select.options.length - 1; i > 0; i--) {
+        select.remove(i);
+    }
+
+    // Add new options from the items array
+    items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item[valueProperty]; // Use specified value property, which can be 'id' for admins
+        option.textContent = item[nameProperty]; // Use specified name property for display
+        select.appendChild(option);
+    });
+}
+
+// Populate dynamic select elements 
+function populateAllApiRequestsChartFilters(metricsData) {
+    
+    populateApiRequestsChartSelect('userAgentSelect', metricsData["User Agents"]);
+    populateApiRequestsChartSelect('adminSelect', metricsData["Admins"], "name", "adminDetails");
+    populateApiRequestsChartSelect('operationSelect', metricsData["Operations"]);
+    populateApiRequestsChartSelect('sourceIpSelect', metricsData["Source IPs"]);
+}
+
+// Initialize event listeners for filter dropdowns
+function initializeFilterEventListeners() {
+    const filters = ['userAgentSelect', 'adminSelect', 'operationSelect', 'sourceIpSelect'];
+    
+    filters.forEach(filterId => {
+        const element = document.getElementById(filterId);
+        if (element) {
+            element.addEventListener('change', updateDashboardWithFilters);
+        } else {
+            console.warn(`Element with id '${filterId}' not found.`);
+        }
+    });
+}
 
 
 // *******************
@@ -476,8 +543,17 @@ const displayMetrics = (metrics) => {
         const userAgentChartData = preparePieChartData(metrics["User Agents"]);
         renderUserAgentPieChart("User Agents", userAgentChartData);
     }, 0);
-
+    populateAllApiRequestsChartFilters(metrics);
     setupTableSortListeners('#apiMetricsContainer');
+    initializeFilterEventListeners();
+
+    // Make sure to call updateDashboardWithFilters when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // ... other initialization code ...
+    updateDashboardWithFilters();
+    // Update the timespan labels
+    updateTimespanLabels(timespanValue);
+});
 };
 
 

@@ -113,7 +113,7 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 2px;
   }
   
 .timespan-header {
@@ -140,7 +140,7 @@ button {
 
 .filter-bar select {
     margin-right: 10px;
-    width: 300px
+    width: 170px
 }
 
 
@@ -427,7 +427,7 @@ td {
 input[type=password],
 select {
     width: 350px;
-    padding: 12px 20px;
+
     margin: 8px 0;
     display: inline-block;
     border: 1px solid #ccc;
@@ -1545,7 +1545,7 @@ cavas #User\ AgentsContainer {
 .metric-bar-chart canvas {
     width: 100% !important;
     height: 100% !important;
-    max-height: 400px;
+    max-height: 300px;
 }
 
 /* Media query for smaller screens */

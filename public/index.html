@@ -223,26 +223,38 @@ The design is styled using an external CSS file (styles.css).
         <!-- Visualization 1: API Requests Grouped by Response Code -->
         <div class="visualization">
           <div class="header-bar">
-            <div class="timespan-header">
-              <h2>Requests by Response Code</h2>
-              <div class="timespan-header">
 
-                <div id="apiRequestsTimespan" class="timespan">
-                  from
-                  <select id="apiRequestsTimespanSelect">
-                    <option value="twoHours">Last 2 Hours</option>
-                    <option value="day" selected>Last Day</option>
-                    <option value="week">Last Week</option>
-                    <option value="month">Last Month</option>
-                  </select>
-                  <span id="apiRequestsTimespanSelectStartDate"></span> to
-                  <span id="apiRequestsTimespanSelectEndDate"></span>
-                </div>
+      
+            <h2>Requests by Response Code</h2>
+            <div class="toolbar">
+              <div class="timespan-selector">
+                from
+                <select id="responseCodeTimespanSelect">
+                  <option value="twoHours">Last 2 Hours</option>
+                  <option value="day" selected>Last Day</option>
+                  <option value="week">Last Week</option>
+                  <option value="month">Last Month</option>
+                </select>
+                <span id="responseCodeTimespanSelectStartDate"></span> to
+                <span id="responseCodeTimespanSelectEndDate"></span>
               </div>
+              <button id="refreshResponseCodeButton" class="icon-button" title="Refresh">
+                <i class="fa fa-refresh"></i>
+              </button>
+              <button id="exportResponseCodeCSVButton" class="icon-button" title="Export to Excel">
+                <i class="fa fa-file-excel-o"></i>
+              </button>
+            
             </div>
           </div>
 
+            <!-- New Toolbar for Requests by Response Code -->
+            <div id="responseCodeToolbar" class="toolbar">
+              <!-- Toolbar content will be inserted here -->
+            </div>
+          
           <div class="filter-bar">
+            Filter on
             <select id="userAgentSelect">
               <option value="">All User Agents</option>
             </select>
@@ -267,6 +279,7 @@ The design is styled using an external CSS file (styles.css).
             <h2>Analysis</h2>
             <div class="toolbar">
               <div class="timespan-selector">
+                from
                 <select id="apiAnalysisTimespanSelect">
                   <option value="twoHours">Last 2 Hours</option>
                   <option value="day" selected>Last Day</option>
@@ -303,25 +316,26 @@ The design is styled using an external CSS file (styles.css).
           <h2>API Request History</h2>
           <div class="toolbar">
             <div class="timespan-selector">
-              <select id="apiAnalysisTimespanSelect">
+              from
+              <select id="apiHistoryTimespanSelect">
                 <option value="twoHours">Last 2 Hours</option>
                 <option value="day" selected>Last Day</option>
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
               </select>
-              <span id="apiAnalysisTimespanSelectStartDate"></span> to
-              <span id="apiAnalysisTimespanSelectEndDate"></span>
+              <span id="apiHistoryTimespanSelectStartDate"></span> to
+              <span id="apiHistoryTimespanSelectEndDate"></span>
             </div>
-            <button id="refreshButton" class="icon-button" title="Refresh">
+            <button id="refreshApiHistoryButton" class="icon-button" title="Refresh">
               <i class="fa fa-refresh"></i>
             </button>
             <div class="load-more">
               <input type="number" id="recordsToLoad" min="1" max="50" value="1">
-              <button id="loadMoreRecordsBtn" class="icon-button" title="Load More">
+              <button id="loadMoreApiHistoryRecordsBtn" class="icon-button" title="Load More">
                 <i class="fa fa-plus"></i>
               </button>
             </div>
-            <button id="exportCSVButton" class="icon-button" title="Export to Excel">
+            <button id="exportApiHistoryCSVButton" class="icon-button" title="Export to Excel">
               <i class="fa fa-file-excel-o"></i>
             </button>
           </div>

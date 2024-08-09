@@ -36,3 +36,78 @@ export const incrementPatternCount = (patternObject, key, isSuccess) => {
     }
     isSuccess ? patternObject[key].success++ : patternObject[key].failure++;
 };
+
+export const showLoader = () => {
+    loader.style.display = 'block';
+};
+
+export const hideLoader = () => {
+    loader.style.display = 'none';
+};
+
+export const getTimespanInSeconds = (timespan) => {
+    const timespanInSeconds = {
+        'twoHours': 7200,   // 2 hours
+        'day': 86400, // 24 hours
+        'week': 604800, // 7 days
+        'month': 2592000 // 30 days
+    };
+    return timespanInSeconds[timespan] || timespanInSeconds['month']; // Default to 30 days if not specified
+};
+
+export const displayNotification = (message) => {
+    const notificationBanner = document.getElementById('notificationBanner');
+    notificationBanner.textContent = message;
+    notificationBanner.style.display = 'block';
+    setTimeout(() => {
+        notificationBanner.style.display = 'none';
+    }, 5000); // Hide the notification after 5 seconds
+};
+
+export const getCurrentDateAndTimespan = (timespan) => {
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in ISO format
+    const timespanLabels = {
+        'twoHours': '2 Hours',
+        'day': '1 Day',
+        'week': '1 Week',
+        'month': '1 Month'
+    };
+    const selectedTimespan = timespanLabels[timespan] || '1 Month'; // Default to 1 Month if not specified
+    return `${currentDate}_${selectedTimespan}`;
+};
+
+export const calculateTimespanDates = (timespanSeconds) => {
+    const endDate = new Date();
+    let startDate = new Date(endDate.getTime() - timespanSeconds * 1000);
+    return { startDate, endDate };
+};
+
+export const updateDateLabels = (timespanSeconds, startId, endId) => {
+    const { startDate, endDate } = calculateTimespanDates(timespanSeconds);
+    const formatOptions = getFormatOptions(timespanSeconds);
+
+    const startElement = document.getElementById(startId);
+    const endElement = document.getElementById(endId);
+
+    if (startElement) {
+        startElement.textContent = new Intl.DateTimeFormat('en-US', formatOptions).format(startDate);
+    } else {
+        console.warn(`Start date element with ID ${startId} not found.`);
+    }
+
+    if (endElement) {
+        endElement.textContent = new Intl.DateTimeFormat('en-US', formatOptions).format(endDate);
+    } else {
+        console.warn(`End date element with ID ${endId} not found.`);
+    }
+};
+
+export const getFormatOptions = (timespanSeconds) => {
+    // Timespans less than or equal to 2 hours show detailed time
+    if (timespanSeconds <= 7200) {
+        return { hour: '2-digit', minute: '2-digit', hour12: false }; // Use 24-hour format
+    }
+    // Use date only for longer timespans
+    return { year: 'numeric', month: '2-digit', day: '2-digit' };
+};
+
