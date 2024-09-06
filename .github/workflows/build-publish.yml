@@ -6,75 +6,66 @@ on:
       - main
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: v1.${{ github.run_number }}
+          release_name: Release v1.${{ github.run_number }}
+          draft: false
+          prerelease: false
+
   build-windows:
+    needs: create-release
     runs-on: windows-latest
-
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-
+      uses: actions/checkout@v3
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '16'
-
     - name: Install dependencies
       run: npm install
-
     - name: Build app for Windows
       run: npm run build-win
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      with:
-        tag_name: v1.${{ github.run_number }}
-        release_name: Release v1.${{ github.run_number }}
-        draft: false
-        prerelease: false
-
     - name: Upload Windows Artifacts
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/*.exe
-        asset_name: meraki-api-webhooks-dashboard.exe
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./dist/meraki-api-webhooks-dashboard-win.exe
+        asset_name: meraki-api-webhooks-dashboard-win.exe
         asset_content_type: application/octet-stream
 
   build-mac:
+    needs: create-release
     runs-on: macos-latest
-
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-
+      uses: actions/checkout@v3
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '16'
-
     - name: Install dependencies
       run: npm install
-
     - name: Build app for macOS
       run: npm run build-mac
-
     - name: Upload macOS Artifacts
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        upload_url: ${{ needs.build-windows.outputs.upload_url }}
-        asset_path: build/*.dmg
-        asset_name: meraki-api-webhooks-dashboard.dmg
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./dist/meraki-api-webhooks-dashboard-mac.dmg
+        asset_name: meraki-api-webhooks-dashboard-mac.dmg
         asset_content_type: application/octet-stream

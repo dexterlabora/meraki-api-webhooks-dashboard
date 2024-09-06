@@ -1,0 +1,28 @@
+[
+    {
+        "adminId": "566327653141931517",
+        "method": "GET",
+        "host": "n392.meraki.com",
+        "path": "/api/v1/networks/L_5663276531418XXXX/appliance/vlans",
+        "queryString": "perPage=1000",
+        "userAgent": "",
+        "ts": "2024-04-04T15:03:26.026206Z",
+        "responseCode": 400,
+        "sourceIp": "193.248.60.48",
+        "version": 1,
+        "operationId": "getNetworkApplianceVlans"
+    },
+    {
+        "adminId": "566327653141931517",
+        "method": "GET",
+        "host": "n392.meraki.com",
+        "path": "/api/v1/networks/L_56632765314184XXXX/wireless/dataRateHistory",
+        "queryString": "deviceSerial=Q2LD-GYL3-XXXX&timespan=86400&ssid=7",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+        "ts": "2024-04-04T15:03:25.960257Z",
+        "responseCode": 200,
+        "sourceIp": "202.0.112.207",
+        "version": 1,
+        "operationId": "getNetworkWirelessDataRateHistory"
+    }
+]
