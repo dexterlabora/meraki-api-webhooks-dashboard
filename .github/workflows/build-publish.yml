@@ -37,6 +37,8 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Build app for Windows
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: npm run build-win
     - name: Upload Windows Artifacts
       uses: actions/upload-release-asset@v1

@@ -74,7 +74,8 @@
     "publish": {
       "provider": "github",
       "private": false,
-      "releaseType": "release"
+      "releaseType": "release",
+      "publishAutoUpdate": false
     }
   },
   "repository": {
