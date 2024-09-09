@@ -33,10 +33,13 @@
   },
   "build": {
     "files": "!./dist/**/*, !./build/**/*, !./mockData/**, !./archive/**, !meraki-api-webhooks-ui-screenshot.png, !.git/**",
-    "appId": "Meraki.API.Webhooks.Dashboard",
+    "appId": "com.yourcompany.meraki-api-webhooks-dashboard",
+    "productName": "meraki-api-webhooks-dashboard",
     "win": {
-      "target": "nsis",
-      "icon": "./icons/icon.ico"
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "mac": {
       "target": [

@@ -35,8 +35,6 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Build app for Windows
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: npm run build-win
     - name: Upload Windows Artifacts
       uses: actions/upload-release-asset@v1
@@ -44,7 +42,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/meraki-api-webhooks-dashboard-win.exe
+        asset_path: ./build/meraki-api-webhooks-dashboard Setup 1.0.0.exe
         asset_name: meraki-api-webhooks-dashboard-win.exe
         asset_content_type: application/octet-stream
 
