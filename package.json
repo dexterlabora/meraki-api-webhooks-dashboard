@@ -48,8 +48,7 @@
           "target": "dmg",
           "arch": [
             "universal"
-          ],
-          "icon": "icons/api-logo.icns"
+          ]
         }
       ],
       "icon": "./icons/api-logo.icns",
