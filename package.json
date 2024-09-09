@@ -8,7 +8,7 @@
     "start": "electron .",
     "build": "electron-builder",
     "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac --publish always",
+    "build-mac": "electron-builder --mac",
     "build-linux": "electron-builder --linux",
     "move-binaries": "cp build/*.exe dist/ && cp build/*.dmg dist/ && cp build/*.AppImage dist/",
     "publish-github": "electron-builder --publish always"
