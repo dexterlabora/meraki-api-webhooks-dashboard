@@ -39,7 +39,8 @@
       "target": [
         "nsis"
       ],
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "icon": "icons/api-logo.ico"
     },
     "mac": {
       "target": [
@@ -47,7 +48,8 @@
           "target": "dmg",
           "arch": [
             "universal"
-          ]
+          ],
+          "icon": "icons/api-logo.icns"
         }
       ],
       "icon": "./icons/api-logo.icns",
